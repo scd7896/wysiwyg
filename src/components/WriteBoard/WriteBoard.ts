@@ -1,18 +1,13 @@
-export default class WriteBoard {
+import { IComponent } from "../../model/BaseStore";
+
+export default class WriteBoard implements IComponent {
 	private board: HTMLElement;
 	private hiddenTextArea: HTMLTextAreaElement;
+	private parent: Element;
 
 	constructor(parent: Element) {
-		const board = document.createElement("div");
-		parent.appendChild(board);
-		this.board = board;
-
-		const textArea = document.createElement("textarea");
-		this.hiddenTextArea = textArea;
-		parent.appendChild(this.hiddenTextArea);
-
-		this.textAreaSetting()
-		this.boardSetting();
+		this.parent = parent;
+		this.render();
 	}
 	
 	private textAreaSetting() {
@@ -27,5 +22,20 @@ export default class WriteBoard {
 
 	getValue() {
 		return this.hiddenTextArea.value;
+	}
+
+	render() {
+		const board = document.createElement("div");
+		this.parent.appendChild(board);
+		this.board = board;
+		this.board.style.setProperty("min-height", "150px");
+		this.board.style.border = "1px solid #aeaeae";
+
+		const textArea = document.createElement("textarea");
+		this.hiddenTextArea = textArea;
+		this.parent.appendChild(this.hiddenTextArea);
+
+		this.textAreaSetting()
+		this.boardSetting();
 	}
 }
