@@ -1,41 +1,41 @@
 import { IComponent } from "../../model/BaseStore";
 
 export default class WriteBoard implements IComponent {
-	private board: HTMLElement;
-	private hiddenTextArea: HTMLTextAreaElement;
-	private parent: Element;
+  private board: HTMLElement;
+  private hiddenTextArea: HTMLTextAreaElement;
+  private parent: Element;
 
-	constructor(parent: Element) {
-		this.parent = parent;
-		this.render();
-	}
-	
-	private textAreaSetting() {
-		this.hiddenTextArea.style.display = "none";
-	}
+  constructor(parent: Element) {
+    this.parent = parent;
+    this.render();
+  }
 
-	private boardSetting() {
-		this.board.style.width = "100%";
-		this.board.contentEditable = "true"
-		this.board.addEventListener("keydown", (e: any) => this.hiddenTextArea.value = this.board.innerHTML);
-	}
+  private textAreaSetting() {
+    this.hiddenTextArea.style.display = "none";
+  }
 
-	getValue() {
-		return this.hiddenTextArea.value;
-	}
+  private boardSetting() {
+    this.board.style.width = "100%";
+    this.board.contentEditable = "true";
+    this.board.addEventListener("keydown", (e: any) => (this.hiddenTextArea.value = this.board.innerHTML));
+  }
 
-	render() {
-		const board = document.createElement("div");
-		this.parent.appendChild(board);
-		this.board = board;
-		this.board.style.setProperty("min-height", "150px");
-		this.board.style.border = "1px solid #aeaeae";
+  getValue() {
+    return this.hiddenTextArea.value;
+  }
 
-		const textArea = document.createElement("textarea");
-		this.hiddenTextArea = textArea;
-		this.parent.appendChild(this.hiddenTextArea);
+  render() {
+    const board = document.createElement("div");
+    this.parent.appendChild(board);
+    this.board = board;
+    this.board.style.setProperty("min-height", "150px");
+    this.board.style.border = "1px solid #aeaeae";
 
-		this.textAreaSetting()
-		this.boardSetting();
-	}
+    const textArea = document.createElement("textarea");
+    this.hiddenTextArea = textArea;
+    this.parent.appendChild(this.hiddenTextArea);
+
+    this.textAreaSetting();
+    this.boardSetting();
+  }
 }

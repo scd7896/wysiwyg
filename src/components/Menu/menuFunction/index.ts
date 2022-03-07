@@ -1,1 +1,1 @@
-export { default as FontSize } from './fontSize';
+export { default as FontSize } from "./fontSize";
