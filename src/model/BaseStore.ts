@@ -18,7 +18,7 @@ export class BaseStore<T> {
 			...nextState
 		}
 
-		this.listeners.map(listener => listener.render());
+		this.listeners.map(listener => listener.update());
 	}
 
 	subscribe(listener: IComponent) {

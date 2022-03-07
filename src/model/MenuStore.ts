@@ -1,9 +1,9 @@
 import { BaseStore } from "./BaseStore";
 
 export class MenuState {
-	fontSize: number;
+	
 	constructor() {
-		this.fontSize = 10;
+		
 	}
 }
 
