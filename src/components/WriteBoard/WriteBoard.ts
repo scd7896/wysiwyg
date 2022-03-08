@@ -16,6 +16,7 @@ export default class WriteBoard implements IComponent {
 
   private boardSetting() {
     this.board.style.width = "100%";
+    this.board.style.setProperty("padding", "12px");
     this.board.contentEditable = "true";
     this.board.addEventListener("keydown", (e: any) => (this.hiddenTextArea.value = this.board.innerHTML));
   }
