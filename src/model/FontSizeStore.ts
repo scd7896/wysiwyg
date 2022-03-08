@@ -25,6 +25,12 @@ class FontSizeStore extends BaseStore<FontSizeState> {
       isInputOpen: false,
     });
   }
+
+  setFontSize(fontSize: number) {
+    this.setState({
+      fontSize,
+    });
+  }
 }
 
 export default new FontSizeStore();
