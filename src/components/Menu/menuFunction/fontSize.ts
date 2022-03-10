@@ -37,6 +37,7 @@ export default class FontSize implements IComponent {
     this.menuOpenButton = menuOpenButton;
     this.inputWrapper = inputWrapper;
 
+    this.fontSizeInput();
     this.wrapperSetting();
     this.buttonSetting();
     this.menuOpenButtonSetting();
@@ -48,12 +49,13 @@ export default class FontSize implements IComponent {
   }
 
   private wrapperSetting() {
-    this.wrapper.style.setProperty("display", "relative");
+    console.dir(this.wrapper);
+    this.wrapper.style.setProperty("position", "relative");
   }
 
   private fontSpanCreating() {
     const span = document.createElement("span");
-    span.style.setProperty("font-size", `${FontSizeStore.state.fontSize + 20}px`);
+    span.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
 
     return span;
   }
@@ -94,5 +96,21 @@ export default class FontSize implements IComponent {
     });
   }
 
-  private fontSizeInput() {}
+  private fontSizeInput() {
+    this.inputWrapper.style.setProperty("position", "absolute");
+    this.inputWrapper.style.setProperty("top", "100%");
+    this.inputWrapper.style.setProperty("left", "0");
+    this.inputWrapper.style.setProperty("display", "none");
+
+    const input = document.createElement("input");
+    input.type = "number";
+    const button = document.createElement("button");
+    button.addEventListener("click", () => {
+      if (!isNaN(Number(input.value))) FontSizeStore.setFontSize(Number(input.value));
+      FontSizeStore.closeInput();
+    });
+    button.textContent = "확인";
+    this.inputWrapper.appendChild(input);
+    this.inputWrapper.appendChild(button);
+  }
 }
