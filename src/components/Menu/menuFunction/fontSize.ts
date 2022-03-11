@@ -1,5 +1,7 @@
+import { RangeSingleton } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import FontSizeStore from "../../../model/FontSizeStore";
+import { setStyle } from "../../../utils/element";
 
 export default class FontSize implements IComponent {
   private parent: HTMLElement;
@@ -49,47 +51,57 @@ export default class FontSize implements IComponent {
   }
 
   private wrapperSetting() {
-    console.dir(this.wrapper);
     this.wrapper.style.setProperty("position", "relative");
   }
 
-  private fontSpanCreating() {
+  private caretEventListener() {
     const span = document.createElement("span");
     span.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
+    span.innerHTML = "&nbsp;";
+    RangeSingleton.getInstance().insertNodeAndFoucs(span);
+  }
 
-    return span;
+  private rangeEventListener() {}
+
+  private rangeFontSizeSetting(node: any) {
+    if (node.nodeName === "#text") {
+      const span = document.createElement("span");
+      setStyle(span, { "font-size": `${FontSizeStore.state.fontSize}px` });
+
+      const cloneNode = node.cloneNode(true);
+      span.appendChild(cloneNode);
+      node.parentElement.replaceChild(span, node);
+      return;
+    }
+
+    if (node.nodeName === "SPAN") {
+      setStyle(node, { "font-size": `${FontSizeStore.state.fontSize}px` });
+      return;
+    }
+
+    node.childNodes.forEach((child: any) => this.rangeFontSizeSetting(child));
   }
 
   private buttonSetting() {
-    this.button.style.setProperty("border", "1px solid #aaa");
-    this.button.style.setProperty("padding", "8px 14px");
-    this.button.style.setProperty("background-color", "white");
+    setStyle(this.button, { border: "1px solid #aaa", padding: "8px 14px", "background-color": "white" });
+
     this.button.addEventListener("click", () => {
-      const selection = window.getSelection();
-
-      if (selection.type === "Range") {
+      if (RangeSingleton.getInstance().type === "Range") {
+        this.rangeEventListener();
       }
-      if (selection.type === "Caret") {
-        const span = this.fontSpanCreating();
-        span.innerHTML = "&nbsp;";
-
-        const range = selection.getRangeAt(0);
-        range.insertNode(span);
-        this.parent.focus();
-        const newRange = document.createRange();
-        newRange.selectNode(span);
-        const newSelection = window.getSelection();
-        newSelection.removeAllRanges();
-        newSelection.addRange(newRange);
+      if (RangeSingleton.getInstance().type === "Caret") {
+        this.caretEventListener();
       }
     });
   }
 
   private menuOpenButtonSetting() {
-    this.menuOpenButton.style.setProperty("border", "1px solid #aaa");
-    this.menuOpenButton.style.setProperty("border-left", "none");
-    this.menuOpenButton.style.setProperty("padding", "8px 2px");
-    this.menuOpenButton.style.setProperty("background-color", "white");
+    setStyle(this.menuOpenButton, {
+      border: "1px solid #aaa",
+      "border-left": "none",
+      padding: "8px 2px",
+      "background-color": "white",
+    });
 
     this.menuOpenButton.addEventListener("click", () => {
       FontSizeStore.state.isInputOpen ? FontSizeStore.closeInput() : FontSizeStore.openInput();
@@ -97,10 +109,7 @@ export default class FontSize implements IComponent {
   }
 
   private fontSizeInput() {
-    this.inputWrapper.style.setProperty("position", "absolute");
-    this.inputWrapper.style.setProperty("top", "100%");
-    this.inputWrapper.style.setProperty("left", "0");
-    this.inputWrapper.style.setProperty("display", "none");
+    setStyle(this.inputWrapper, { position: "absolute", top: "100%", left: "0", display: "none" });
 
     const input = document.createElement("input");
     input.type = "number";
