@@ -3,11 +3,12 @@ import { IComponent } from "../../../model/BaseStore";
 import FontSizeStore from "../../../model/FontSizeStore";
 import { hasContains } from "../../../utils/dom";
 import { setStyle } from "../../../utils/element";
+import { onSubmit } from "web-form-helper";
 
 export default class FontSize implements IComponent {
   private parent: HTMLElement;
   private wrapper: HTMLDivElement;
-  private inputWrapper: HTMLDivElement;
+  private inputWrapper: HTMLFormElement;
   private button: HTMLButtonElement;
   private menuOpenButton: HTMLButtonElement;
 
@@ -28,7 +29,7 @@ export default class FontSize implements IComponent {
     }
   }
 
-  inputWrapperClickListener = (event: any) => {
+  private inputWrapperClickListener = (event: any) => {
     if (FontSizeStore.state.isInputOpen && !hasContains(this.inputWrapper, event.target as HTMLElement)) {
       FontSizeStore.closeInput();
     }
@@ -38,7 +39,7 @@ export default class FontSize implements IComponent {
     const wrapper = document.createElement("div");
     const button = document.createElement("button");
     const menuOpenButton = document.createElement("button");
-    const inputWrapper = document.createElement("div");
+    const inputWrapper = document.createElement("form");
 
     button.textContent = `${FontSizeStore.state.fontSize}px`;
     menuOpenButton.textContent = "setting";
@@ -134,17 +135,22 @@ export default class FontSize implements IComponent {
 
     const input = document.createElement("input");
     input.type = "number";
+    input.name = "inputValue";
     const button = document.createElement("button");
-    button.addEventListener("click", () => {
-      if (!isNaN(Number(input.value))) FontSizeStore.setFontSize(Number(input.value));
+    button.type = "submit";
+    this.inputWrapper.addEventListener(
+      "submit",
+      onSubmit(({ inputValue }) => {
+        if (!isNaN(Number(input.value))) FontSizeStore.setFontSize(inputValue);
 
-      if (RangeSingleton.getInstance().selection.type === "Range") {
-        this.rangeEventListener();
-      } else {
-        this.caretEventListener();
-      }
-      FontSizeStore.closeInput();
-    });
+        if (RangeSingleton.getInstance().selection.type === "Range") {
+          this.rangeEventListener();
+        } else {
+          this.caretEventListener();
+        }
+        FontSizeStore.closeInput();
+      }),
+    );
     button.textContent = "확인";
     this.inputWrapper.appendChild(input);
     this.inputWrapper.appendChild(button);

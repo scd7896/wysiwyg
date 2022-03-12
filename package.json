@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "babel-loader": "^8.2.3",
+    "web-form-helper": "^1.0.3",
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2"
   },
