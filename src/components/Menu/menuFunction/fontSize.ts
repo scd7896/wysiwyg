@@ -29,12 +29,6 @@ export default class FontSize implements IComponent {
     }
   }
 
-  private inputWrapperClickListener = (event: any) => {
-    if (FontSizeStore.state.isInputOpen && !hasContains(this.inputWrapper, event.target as HTMLElement)) {
-      FontSizeStore.closeInput();
-    }
-  };
-
   render() {
     const wrapper = document.createElement("div");
     const button = document.createElement("button");
@@ -49,7 +43,7 @@ export default class FontSize implements IComponent {
     this.menuOpenButton = menuOpenButton;
     this.inputWrapper = inputWrapper;
 
-    this.fontSizeInput();
+    this.fontSizeInputSetting();
     this.wrapperSetting();
     this.buttonSetting();
     this.menuOpenButtonSetting();
@@ -60,49 +54,23 @@ export default class FontSize implements IComponent {
     this.parent.appendChild(wrapper);
   }
 
+  private inputWrapperClickListener = (event: any) => {
+    if (FontSizeStore.state.isInputOpen && !hasContains(this.inputWrapper, event.target as HTMLElement)) {
+      FontSizeStore.closeInput();
+    }
+  };
+
   private wrapperSetting() {
     this.wrapper.style.setProperty("position", "relative");
-  }
-
-  private caretEventListener() {
-    const span = document.createElement("span");
-    span.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
-    span.innerHTML = "&nbsp;";
-    RangeSingleton.getInstance().insertNodeAndFoucs(span);
-  }
-
-  private rangeEventListener() {
-    const range = RangeSingleton.getInstance().range;
-    const documents = range.extractContents();
-    range.insertNode(this.changeText(documents));
-  }
-
-  private changeText(node: any) {
-    if (node.nodeName === "#text") {
-      const span = document.createElement("span");
-      span.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
-      span.textContent = node.textContent;
-      return span;
-    }
-
-    if (node.nodeName === "SPAN") {
-      node.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
-    }
-
-    node.childNodes.forEach((child: any) => node.replaceChild(this.changeText(child), child));
-    return node;
   }
 
   private buttonSetting() {
     setStyle(this.button, { border: "1px solid #aaa", padding: "8px 14px", "background-color": "white" });
 
     this.button.addEventListener("click", () => {
-      if (RangeSingleton.getInstance().type === "Range") {
-        this.rangeEventListener();
-      }
-      if (RangeSingleton.getInstance().type === "Caret") {
-        this.caretEventListener();
-      }
+      RangeSingleton.getInstance().fontSet({
+        "font-size": `${FontSizeStore.state.fontSize}px`,
+      });
     });
   }
 
@@ -119,7 +87,7 @@ export default class FontSize implements IComponent {
     });
   }
 
-  private fontSizeInput() {
+  private fontSizeInputSetting() {
     setStyle(this.inputWrapper, {
       position: "absolute",
       height: "48px",
