@@ -73,10 +73,10 @@ export default class FontSize implements IComponent {
   private rangeEventListener() {
     const range = RangeSingleton.getInstance().range;
     const documents = range.extractContents();
-    range.insertNode(this.findText(documents));
+    range.insertNode(this.changeText(documents));
   }
 
-  private findText(node: any) {
+  private changeText(node: any) {
     if (node.nodeName === "#text") {
       const span = document.createElement("span");
       span.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
@@ -84,27 +84,13 @@ export default class FontSize implements IComponent {
       return span;
     }
 
-    node.childNodes.forEach((child: any) => node.replaceChild(this.findText(child), child));
-    return node;
-  }
-
-  private rangeFontSizeSetting(node: any) {
-    if (node.nodeName === "#text") {
-      const span = document.createElement("span");
-      setStyle(span, { "font-size": `${FontSizeStore.state.fontSize}px` });
-
-      const cloneNode = node.cloneNode(true);
-      span.appendChild(cloneNode);
-      node.parentElement.replaceChild(span, node);
-      return;
-    }
-
     if (node.nodeName === "SPAN") {
-      setStyle(node, { "font-size": `${FontSizeStore.state.fontSize}px` });
-      return;
+      node.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
+      return node;
     }
 
-    node.childNodes.forEach((child: any) => this.rangeFontSizeSetting(child));
+    node.childNodes.forEach((child: any) => node.replaceChild(this.changeText(child), child));
+    return node;
   }
 
   private buttonSetting() {
