@@ -1,6 +1,7 @@
 import { RangeSingleton } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import FontSizeStore from "../../../model/FontSizeStore";
+import { hasContains } from "../../../utils/dom";
 import { setStyle } from "../../../utils/element";
 
 export default class FontSize implements IComponent {
@@ -20,10 +21,18 @@ export default class FontSize implements IComponent {
     this.button.textContent = `${FontSizeStore.state.fontSize}px`;
     if (FontSizeStore.state.isInputOpen) {
       this.inputWrapper.style.setProperty("display", "block");
+      window.addEventListener("click", this.inputWrapperClickListener);
     } else {
       this.inputWrapper.style.setProperty("display", "none");
+      window.removeEventListener("click", this.inputWrapperClickListener);
     }
   }
+
+  inputWrapperClickListener = (event: any) => {
+    if (FontSizeStore.state.isInputOpen && !hasContains(this.inputWrapper, event.target as HTMLElement)) {
+      FontSizeStore.closeInput();
+    }
+  };
 
   render() {
     const wrapper = document.createElement("div");
@@ -72,7 +81,6 @@ export default class FontSize implements IComponent {
       const span = document.createElement("span");
       span.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
       span.textContent = node.textContent;
-      console.dir(node);
       return span;
     }
 
@@ -126,7 +134,17 @@ export default class FontSize implements IComponent {
   }
 
   private fontSizeInput() {
-    setStyle(this.inputWrapper, { position: "absolute", top: "100%", left: "0", display: "none" });
+    setStyle(this.inputWrapper, {
+      position: "absolute",
+      height: "48px",
+      top: "100%",
+      left: "0",
+      display: "none",
+      background: "white",
+      padding: "8px",
+      "box-shadow": "4px 4px 4px rgba(0,0,0,0.8)",
+      "border-radius": "4px",
+    });
 
     const input = document.createElement("input");
     input.type = "number";

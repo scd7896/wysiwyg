@@ -5,6 +5,7 @@ export interface IComponent {
 
 export class BaseStore<T> {
   private listeners: IComponent[];
+  private timer: number;
   public state: T;
 
   constructor(defaultState: T) {
@@ -17,8 +18,13 @@ export class BaseStore<T> {
       ...this.state,
       ...nextState,
     };
-
-    this.listeners.map((listener) => listener.update());
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = 0;
+    }
+    this.timer = setTimeout(() => {
+      this.listeners.map((listener) => listener.update());
+    }, 1);
   }
 
   subscribe(listener: IComponent) {
