@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@emotion/css": "^11.7.1",
     "babel-loader": "^8.2.3",
     "web-form-helper": "^1.0.3",
     "webpack": "^5.70.0",

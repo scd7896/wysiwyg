@@ -1,8 +1,6 @@
-import { RangeSingleton } from "../../../model";
+import { RangeSingleton, FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
-import FontSizeStore from "../../../model/FontSizeStore";
-import { hasContains } from "../../../utils/dom";
-import { setStyle } from "../../../utils/element";
+import { hasContains, setStyle } from "../../../utils/dom";
 import { onSubmit } from "web-form-helper";
 
 export default class FontSize implements IComponent {

@@ -1,4 +1,4 @@
-import { setStyle } from "../utils/element";
+import { setStyle } from "../utils/dom";
 
 class RangeSingleton {
   selection: Selection;
