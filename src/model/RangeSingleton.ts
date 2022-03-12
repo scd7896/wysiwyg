@@ -1,3 +1,5 @@
+import { setStyle } from "../utils/element";
+
 class RangeSingleton {
   selection: Selection;
   type: string;
@@ -20,7 +22,16 @@ class RangeSingleton {
     return this.instance;
   }
 
-  insertNodeAndFoucs(node: HTMLElement) {
+  fontSet(styles: Record<string, string>) {
+    if (this.type === "Range") {
+      this.rangeEventListener(styles);
+    }
+    if (this.type === "Caret") {
+      this.caretEventListener(styles);
+    }
+  }
+
+  private insertNodeAndFoucs(node: HTMLElement) {
     this.range.insertNode(node);
     this.parent.focus();
     const newRange = document.createRange();
@@ -28,6 +39,35 @@ class RangeSingleton {
     const newSelection = window.getSelection();
     newSelection.removeAllRanges();
     newSelection.addRange(newRange);
+  }
+
+  private caretEventListener(styles: Record<string, string>) {
+    const span = document.createElement("span");
+    setStyle(span, styles);
+    span.innerHTML = "&nbsp;";
+    RangeSingleton.getInstance().insertNodeAndFoucs(span);
+  }
+
+  private rangeEventListener(styles: Record<string, string>) {
+    const documents = this.range.extractContents();
+    this.range.insertNode(this.changeText(documents, styles));
+  }
+
+  private changeText(node: any, style: Record<string, string>) {
+    if (node.nodeName === "#text") {
+      const span = document.createElement("span");
+      setStyle(span, style);
+      span.textContent = node.textContent;
+      return span;
+    }
+
+    if (node.nodeName === "SPAN") {
+      setStyle(node, style);
+    }
+
+    node.childNodes.forEach((child: any) => node.replaceChild(this.changeText(child, style), child));
+
+    return node;
   }
 }
 
