@@ -4,7 +4,7 @@ class FontColorState {
   color: string;
 
   constructor() {
-    this.color = "";
+    this.color = "#000000";
   }
 }
 

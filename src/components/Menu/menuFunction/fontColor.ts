@@ -1,11 +1,64 @@
-export default class FontColor {
-  constructor(parent: HTMLElement) {
-    const wrapper = document.createElement("div");
+import { FontColorStore, RangeSingleton } from "../../../model";
+import { setStyle } from "../../../utils/dom";
 
-    parent.appendChild(wrapper);
+export default class FontColor {
+  private parent: HTMLElement;
+  private wrapper: HTMLDivElement;
+  private applyButton: HTMLButtonElement;
+  private settingButton: HTMLButtonElement;
+  private colorPicker: HTMLInputElement;
+
+  constructor(parent: HTMLElement) {
+    this.parent = parent;
+
+    const wrapper = document.createElement("div");
+    this.wrapper = wrapper;
+    const applyButton = document.createElement("button");
+    this.applyButton = applyButton;
+    const settingButton = document.createElement("button");
+    this.settingButton = settingButton;
+
+    const input = document.createElement("input");
+    input.type = "color";
+    this.colorPicker = input;
+
+    this.wrapper.appendChild(applyButton);
+    this.wrapper.appendChild(settingButton);
+    this.wrapper.appendChild(this.colorPicker);
+    this.parent.appendChild(wrapper);
+
+    this.render();
+    FontColorStore.subscribe(this);
   }
 
-  render() {}
+  render() {
+    setStyle(this.applyButton, {
+      width: "22px",
+      height: "22px",
+      background: FontColorStore.state.color,
+    });
 
-  update() {}
+    setStyle(this.colorPicker, {
+      display: "none",
+    });
+
+    this.settingButton.textContent = "pick";
+    this.settingButton.addEventListener("click", () => {
+      this.colorPicker.click();
+    });
+    this.colorPicker.addEventListener("change", (e: any) => {
+      FontColorStore.setColor(e.target.value);
+    });
+    this.applyButton.addEventListener("click", () => {
+      RangeSingleton.getInstance().fontSet({
+        color: FontColorStore.state.color,
+      });
+    });
+  }
+
+  update() {
+    setStyle(this.applyButton, {
+      background: FontColorStore.state.color,
+    });
+  }
 }

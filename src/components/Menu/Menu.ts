@@ -5,7 +5,9 @@ import * as menuFunction from "./menuFunction";
 import { css } from "@emotion/css";
 
 const menuClass = css`
-  background-color: black;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   div + div {
     margin-left: 8px;
   }
@@ -25,7 +27,6 @@ export default class Menu implements IComponent {
     menu.classList.add(menuClass);
     const menuFunctionList = menuFunction as any;
     const keys = Object.keys(menuFunction) as Array<keyof MenuState>;
-    console.log(keys);
     this.chlidren = keys.map((key) => new menuFunctionList[key](menu));
     this.parent.appendChild(menu);
   }
