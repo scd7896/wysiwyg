@@ -87,7 +87,6 @@ export default class FontSize implements IComponent {
 
     if (node.nodeName === "SPAN") {
       node.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
-      return node;
     }
 
     node.childNodes.forEach((child: any) => node.replaceChild(this.changeText(child), child));
@@ -143,11 +142,6 @@ export default class FontSize implements IComponent {
       onSubmit(({ inputValue }) => {
         if (!isNaN(Number(input.value))) FontSizeStore.setFontSize(inputValue);
 
-        if (RangeSingleton.getInstance().selection.type === "Range") {
-          this.rangeEventListener();
-        } else {
-          this.caretEventListener();
-        }
         FontSizeStore.closeInput();
       }),
     );
