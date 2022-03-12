@@ -1,18 +1,13 @@
 import { BaseStore } from "./BaseStore";
 
 export class MenuState {
-	fontSize: number;
-	constructor() {
-		this.fontSize = 10;
-	}
+  constructor() {}
 }
 
-
-
 class MenuStore extends BaseStore<MenuState> {
-	constructor() {
-		super(new MenuState());
-	}
+  constructor() {
+    super(new MenuState());
+  }
 }
 
 export default new MenuStore();
