@@ -61,7 +61,24 @@ export default class FontSize implements IComponent {
     RangeSingleton.getInstance().insertNodeAndFoucs(span);
   }
 
-  private rangeEventListener() {}
+  private rangeEventListener() {
+    const range = RangeSingleton.getInstance().range;
+    const documents = range.extractContents();
+    range.insertNode(this.findText(documents));
+  }
+
+  private findText(node: any) {
+    if (node.nodeName === "#text") {
+      const span = document.createElement("span");
+      span.style.setProperty("font-size", `${FontSizeStore.state.fontSize}px`);
+      span.textContent = node.textContent;
+      console.dir(node);
+      return span;
+    }
+
+    node.childNodes.forEach((child: any) => node.replaceChild(this.findText(child), child));
+    return node;
+  }
 
   private rangeFontSizeSetting(node: any) {
     if (node.nodeName === "#text") {
@@ -116,6 +133,12 @@ export default class FontSize implements IComponent {
     const button = document.createElement("button");
     button.addEventListener("click", () => {
       if (!isNaN(Number(input.value))) FontSizeStore.setFontSize(Number(input.value));
+
+      if (RangeSingleton.getInstance().selection.type === "Range") {
+        this.rangeEventListener();
+      } else {
+        this.caretEventListener();
+      }
       FontSizeStore.closeInput();
     });
     button.textContent = "확인";
