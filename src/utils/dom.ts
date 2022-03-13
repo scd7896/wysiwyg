@@ -8,3 +8,8 @@ export const hasContains = (wrapper: HTMLElement, target: HTMLElement) => {
 
   return result;
 };
+
+export const setStyle = (node: HTMLElement, style: Record<string, string>) => {
+  const keys = Object.keys(style);
+  keys.map((key) => node.style.setProperty(key, style[key]));
+};

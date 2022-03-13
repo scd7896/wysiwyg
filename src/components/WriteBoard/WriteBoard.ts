@@ -1,4 +1,5 @@
 import { IComponent } from "../../model/BaseStore";
+import { setStyle } from "../../utils/dom";
 
 export default class WriteBoard implements IComponent {
   private board: HTMLElement;
@@ -15,8 +16,11 @@ export default class WriteBoard implements IComponent {
   }
 
   private boardSetting() {
-    this.board.style.width = "100%";
-    this.board.style.setProperty("padding", "12px");
+    setStyle(this.board, {
+      width: "100%",
+      padding: "12px",
+      "box-sizing": "border-box",
+    });
     this.board.contentEditable = "true";
     this.board.addEventListener("keydown", (e: any) => (this.hiddenTextArea.value = this.board.innerHTML));
   }

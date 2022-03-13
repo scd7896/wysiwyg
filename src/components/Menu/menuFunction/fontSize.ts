@@ -1,8 +1,6 @@
-import { RangeSingleton } from "../../../model";
+import { RangeSingleton, FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
-import FontSizeStore from "../../../model/FontSizeStore";
-import { hasContains } from "../../../utils/dom";
-import { setStyle } from "../../../utils/element";
+import { hasContains, setStyle } from "../../../utils/dom";
 import { onSubmit } from "web-form-helper";
 
 export default class FontSize implements IComponent {
@@ -83,7 +81,12 @@ export default class FontSize implements IComponent {
     });
 
     this.menuOpenButton.addEventListener("click", () => {
-      FontSizeStore.state.isInputOpen ? FontSizeStore.closeInput() : FontSizeStore.openInput();
+      if (FontSizeStore.state.isInputOpen) {
+        FontSizeStore.closeInput();
+      } else {
+        RangeSingleton.getInstance().tmpSave();
+        FontSizeStore.openInput();
+      }
     });
   }
 
@@ -103,13 +106,14 @@ export default class FontSize implements IComponent {
     const input = document.createElement("input");
     input.type = "number";
     input.name = "inputValue";
+    input.defaultValue = FontSizeStore.state.fontSize.toString();
     const button = document.createElement("button");
     button.type = "submit";
     this.inputWrapper.addEventListener(
       "submit",
       onSubmit(({ inputValue }) => {
         if (!isNaN(Number(input.value))) FontSizeStore.setFontSize(inputValue);
-
+        RangeSingleton.getInstance().fontSet({ "font-size": `${inputValue}px` });
         FontSizeStore.closeInput();
       }),
     );
