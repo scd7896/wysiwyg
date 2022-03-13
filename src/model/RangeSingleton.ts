@@ -6,6 +6,10 @@ class RangeSingleton {
   range: Range;
   parent: HTMLElement;
 
+  tmpFocusSelection: Selection;
+  tmpFocusRange: Range;
+  tmpFocusType: string;
+
   private static instance: RangeSingleton;
   private constructor(parent?: HTMLElement) {
     this.parent = parent;
@@ -23,12 +27,26 @@ class RangeSingleton {
   }
 
   fontSet(styles: Record<string, string>) {
+    this.selection = this.tmpFocusSelection || this.selection;
+    this.range = this.tmpFocusRange || this.range;
+    this.type = this.tmpFocusType || this.type;
+
     if (this.type === "Range") {
       this.rangeEventListener(styles);
     }
     if (this.type === "Caret") {
       this.caretEventListener(styles);
     }
+
+    this.tmpFocusSelection = undefined;
+    this.tmpFocusRange = undefined;
+    this.tmpFocusType = undefined;
+  }
+
+  tmpSave() {
+    this.tmpFocusSelection = this.selection;
+    this.tmpFocusRange = this.range;
+    this.tmpFocusType = this.type;
   }
 
   private insertNodeAndFoucs(node: HTMLElement) {

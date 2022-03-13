@@ -49,10 +49,12 @@ export default class FontColor {
 
     this.settingButton.textContent = "pick";
     this.settingButton.addEventListener("click", () => {
+      RangeSingleton.getInstance().tmpSave();
       this.colorPicker.click();
     });
     this.colorPicker.addEventListener("change", (e: any) => {
       FontColorStore.setColor(e.target.value);
+      RangeSingleton.getInstance().fontSet({ color: e.target.value });
     });
     this.applyButton.addEventListener("click", () => {
       RangeSingleton.getInstance().fontSet({

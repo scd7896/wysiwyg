@@ -81,7 +81,12 @@ export default class FontSize implements IComponent {
     });
 
     this.menuOpenButton.addEventListener("click", () => {
-      FontSizeStore.state.isInputOpen ? FontSizeStore.closeInput() : FontSizeStore.openInput();
+      if (FontSizeStore.state.isInputOpen) {
+        FontSizeStore.closeInput();
+      } else {
+        RangeSingleton.getInstance().tmpSave();
+        FontSizeStore.openInput();
+      }
     });
   }
 
@@ -108,7 +113,7 @@ export default class FontSize implements IComponent {
       "submit",
       onSubmit(({ inputValue }) => {
         if (!isNaN(Number(input.value))) FontSizeStore.setFontSize(inputValue);
-
+        RangeSingleton.getInstance().fontSet({ "font-size": `${inputValue}px` });
         FontSizeStore.closeInput();
       }),
     );
