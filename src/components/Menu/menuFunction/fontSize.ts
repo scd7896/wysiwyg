@@ -101,6 +101,7 @@ export default class FontSize implements IComponent {
     const input = document.createElement("input");
     input.type = "number";
     input.name = "inputValue";
+    input.defaultValue = FontSizeStore.state.fontSize.toString();
     const button = document.createElement("button");
     button.type = "submit";
     this.inputWrapper.addEventListener(

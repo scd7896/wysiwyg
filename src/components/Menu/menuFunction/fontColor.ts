@@ -33,13 +33,18 @@ export default class FontColor {
 
   render() {
     setStyle(this.applyButton, {
-      width: "22px",
-      height: "22px",
+      width: "40px",
+      height: "40px",
       background: FontColorStore.state.color,
     });
 
     setStyle(this.colorPicker, {
       display: "none",
+    });
+
+    setStyle(this.wrapper, {
+      display: "flex",
+      "flex-direction": "column",
     });
 
     this.settingButton.textContent = "pick";
