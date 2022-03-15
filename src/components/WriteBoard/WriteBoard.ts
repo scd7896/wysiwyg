@@ -22,6 +22,7 @@ export default class WriteBoard implements IComponent {
       "box-sizing": "border-box",
     });
     this.board.contentEditable = "true";
+    this.board.classList.add("board");
     this.board.addEventListener("keydown", (e: any) => (this.hiddenTextArea.value = this.board.innerHTML));
   }
 

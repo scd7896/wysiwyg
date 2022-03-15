@@ -1,10 +1,14 @@
-import { setStyle } from "../utils/dom";
+import { hasContains, setStyle } from "../utils/dom";
+import { BaseStore } from "./BaseStore";
 
-class RangeSingleton {
+class RangeSingleton extends BaseStore<{}> {
   selection: Selection;
   type: string;
   range: Range;
   parent: HTMLElement;
+  anchorNode: Node;
+  focusNode: Node;
+  rangeNodes: Node[];
 
   tmpFocusSelection: Selection;
   tmpFocusRange: Range;
@@ -12,11 +16,42 @@ class RangeSingleton {
 
   private static instance: RangeSingleton;
   private constructor(parent?: HTMLElement) {
+    super({});
     this.parent = parent;
+    this.rangeNodes = [];
+
     document.addEventListener("selectionchange", () => {
       this.selection = document.getSelection();
       this.type = this.selection.type;
       this.range = this.selection.getRangeAt(0);
+      this.anchorNode = this.selection.anchorNode;
+      this.focusNode = this.selection.focusNode;
+      this.rangeNodes = [];
+      if (this.selection.type === "Range") {
+        this.setRangeNode();
+      }
+      console.log(this.rangeNodes);
+      this.setState({});
+    });
+  }
+
+  private setRangeNode() {
+    let flag = false;
+    const board = this.parent.querySelector(".board");
+    board.childNodes.forEach((child) => {
+      if (flag) {
+        this.rangeNodes.push(child);
+      }
+
+      if (hasContains(child, this.selection.anchorNode)) {
+        if (!flag) this.rangeNodes.push(this.selection.anchorNode);
+        flag = !flag;
+      }
+
+      if (hasContains(child, this.selection.focusNode)) {
+        if (!flag) this.rangeNodes.push(this.selection.focusNode);
+        flag = !flag;
+      }
     });
   }
 
