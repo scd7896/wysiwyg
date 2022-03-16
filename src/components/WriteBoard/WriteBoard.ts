@@ -23,7 +23,27 @@ export default class WriteBoard implements IComponent {
     });
     this.board.contentEditable = "true";
     this.board.classList.add("board");
-    this.board.addEventListener("keydown", (e: any) => (this.hiddenTextArea.value = this.board.innerHTML));
+    this.board.addEventListener("keydown", (e: any) => {
+      this.hiddenTextArea.value = this.board.innerHTML;
+      if (
+        this.board.childNodes.length === 0 ||
+        (this.board.childNodes.length <= 1 && this.board.childNodes.item(0).nodeName === "BR")
+      ) {
+        this.createDummyDiv();
+      }
+    });
+    this.createDummyDiv();
+  }
+
+  private createDummyDiv() {
+    const dummyDiv = document.createElement("div");
+    const dummyBr = document.createElement("br");
+    dummyDiv.appendChild(dummyBr);
+    if (this.board.childNodes.length === 0) {
+      this.board.appendChild(dummyDiv);
+    } else {
+      this.board.replaceChild(dummyDiv, this.board.childNodes.item(0));
+    }
   }
 
   getValue() {
