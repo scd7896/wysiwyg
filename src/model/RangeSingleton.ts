@@ -106,43 +106,65 @@ class RangeSingleton extends BaseStore<{}> {
     RangeSingleton.getInstance().insertNodeAndFoucs(span);
   }
 
-  private oneLineElementChange(styles: Record<string, string>) {
+  private oneTextNodeStyleChange(styles: Record<string, string>) {
     const targetNode = this.rangeNodes[0];
 
-    if (this.selection.anchorNode === this.selection.focusNode) {
-      const span = document.createElement("span");
-      const fragmentNode = document.createDocumentFragment();
-      setStyle(span, styles);
-      const text = this.selection.anchorNode.textContent;
-      const firstText = document.createTextNode(text.slice(0, this.range.startOffset));
-      span.textContent = text.slice(this.range.startOffset, this.range.endOffset);
-      const thirdText = document.createTextNode(text.slice(this.range.endOffset));
+    const span = document.createElement("span");
+    const fragmentNode = document.createDocumentFragment();
+    setStyle(span, styles);
+    const text = this.selection.anchorNode.textContent;
+    const firstText = document.createTextNode(text.slice(0, this.range.startOffset));
+    span.textContent = text.slice(this.range.startOffset, this.range.endOffset);
+    const thirdText = document.createTextNode(text.slice(this.range.endOffset));
 
-      fragmentNode.appendChild(firstText);
-      fragmentNode.appendChild(span);
-      fragmentNode.appendChild(thirdText);
-      if (targetNode.nodeName === "#text") {
-        targetNode.parentElement.replaceChild(fragmentNode, targetNode);
-      } else {
-        targetNode.replaceChild(fragmentNode, this.selection.anchorNode);
-      }
+    fragmentNode.appendChild(firstText);
+    fragmentNode.appendChild(span);
+    fragmentNode.appendChild(thirdText);
+    if (targetNode.nodeName === "#text") {
+      targetNode.parentElement.replaceChild(fragmentNode, targetNode);
+    } else {
+      targetNode.replaceChild(fragmentNode, this.selection.anchorNode);
     }
   }
 
   private rangeEventListener(styles: Record<string, string>) {
-    const elementNodeStyleChange = (node: Node) => {
-      // console.dir(node);
+    const styleKeys = Object.keys(styles);
+
+    const findSpanStyleRemove = (span: HTMLSpanElement) => {
+      styleKeys.map((key) => span.style.removeProperty(key));
+
+      span.childNodes.forEach((child) => {
+        if (child.nodeName === "SPAN") findSpanStyleRemove(child as HTMLSpanElement);
+      });
+
+      if (span.style.length === 0) {
+        const text = document.createTextNode(span.textContent);
+        span.parentElement.replaceChild(text, span);
+      }
+    };
+
+    const elementNodeStyleChange = (node: HTMLDivElement, index: number) => {
+      if (index === 0 || index === this.rangeNodes.length - 1) {
+      } else {
+        const span = document.createElement("span");
+        setStyle(span, styles);
+        node.childNodes.forEach((child) => span.appendChild(child));
+        node.innerHTML = "";
+        node.appendChild(span);
+        const spanChilds: HTMLSpanElement[] = [];
+        span.childNodes.forEach((child) => {
+          if (child.nodeName === "SPAN") spanChilds.push(child as HTMLSpanElement);
+        });
+        spanChilds.map((span) => findSpanStyleRemove(span));
+      }
     };
     console.log(this.rangeNodes, this.selection, this.range);
-    if (this.rangeNodes.length > 1) {
-      // this.rangeNodes.map((node, index) => {
-      //   if (node.nodeName === "#text") {
-      //   } else {
-      //     elementNodeStyleChange(node);
-      //   }
-      // });
+    if (this.anchorNode !== this.focusNode) {
+      this.rangeNodes.map((node, index) => {
+        elementNodeStyleChange(node as HTMLDivElement, index);
+      });
     } else {
-      this.oneLineElementChange(styles);
+      this.oneTextNodeStyleChange(styles);
     }
   }
 }
