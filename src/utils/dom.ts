@@ -1,4 +1,4 @@
-export const hasContains = (wrapper: HTMLElement, target: HTMLElement) => {
+export const hasContains = (wrapper: HTMLElement | Node, target: HTMLElement | Node) => {
   let tmpTarget = target;
   let result = false;
   while (tmpTarget) {
@@ -8,6 +8,8 @@ export const hasContains = (wrapper: HTMLElement, target: HTMLElement) => {
 
   return result;
 };
+
+export const hasStyles = (style: string, target: HTMLElement | Node) => {};
 
 export const setStyle = (node: HTMLElement, style: Record<string, string>) => {
   const keys = Object.keys(style);

@@ -14,6 +14,8 @@ class RangeSingleton extends BaseStore<{}> {
   tmpFocusRange: Range;
   tmpFocusType: string;
   tmpRangeNodes: Node[];
+  tmpFocusNode: Node;
+  tmpAnchorNode: Node;
 
   private static instance: RangeSingleton;
   private constructor(parent?: HTMLElement) {
@@ -27,7 +29,6 @@ class RangeSingleton extends BaseStore<{}> {
       this.range = this.selection.getRangeAt(0);
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
-      this.rangeNodes = [];
       if (this.selection.type === "Range") {
         this.setRangeNode();
       }
@@ -39,6 +40,7 @@ class RangeSingleton extends BaseStore<{}> {
   private setRangeNode() {
     let flag = false;
     const board = this.parent.querySelector(".board");
+    this.rangeNodes = [];
 
     board.childNodes.forEach((child) => {
       if (flag) {
@@ -68,6 +70,11 @@ class RangeSingleton extends BaseStore<{}> {
     this.range = this.tmpFocusRange || this.range;
     this.type = this.tmpFocusType || this.type;
     this.rangeNodes = this.tmpRangeNodes || this.rangeNodes;
+    this.focusNode = this.tmpFocusNode || this.focusNode;
+    this.anchorNode = this.tmpAnchorNode || this.anchorNode;
+    if (this.tmpFocusType === "Range") {
+      this.setRangeNode();
+    }
 
     if (this.type === "Range") {
       this.rangeEventListener(styles);
@@ -80,6 +87,8 @@ class RangeSingleton extends BaseStore<{}> {
     this.tmpFocusRange = undefined;
     this.tmpFocusType = undefined;
     this.tmpRangeNodes = undefined;
+    this.tmpFocusNode = undefined;
+    this.tmpAnchorNode = undefined;
   }
 
   tmpSave() {
@@ -87,6 +96,8 @@ class RangeSingleton extends BaseStore<{}> {
     this.tmpFocusRange = this.range;
     this.tmpFocusType = this.type;
     this.tmpRangeNodes = this.rangeNodes;
+    this.tmpFocusNode = this.focusNode;
+    this.tmpAnchorNode = this.anchorNode;
   }
 
   private insertNodeAndFoucs(node: HTMLElement) {
@@ -107,7 +118,7 @@ class RangeSingleton extends BaseStore<{}> {
   }
 
   private oneTextNodeStyleChange(styles: Record<string, string>) {
-    const targetNode = this.rangeNodes[0];
+    const targetNode = this.focusNode;
 
     const span = document.createElement("span");
     const fragmentNode = document.createDocumentFragment();
@@ -143,8 +154,57 @@ class RangeSingleton extends BaseStore<{}> {
       }
     };
 
+    let flag = false;
+
+    const firstOrLastStyleChange = (node: Node, index: number) => {
+      const span = document.createElement("span");
+      setStyle(span, styles);
+      const childNodes: Node[] = [];
+      node.childNodes.forEach((child) => {
+        childNodes.push(child);
+      });
+      if (node === this.focusNode || node === this.anchorNode) {
+        if (node.nodeName === "#text") {
+          const fragment = document.createDocumentFragment();
+          const textContent = node.textContent;
+          if (index === 0) {
+            const firstText = document.createTextNode(textContent.slice(0, this.range.startOffset));
+            span.textContent = textContent.slice(this.range.startOffset);
+            fragment.appendChild(firstText);
+            fragment.appendChild(span);
+          } else {
+            span.textContent = textContent.slice(0, this.range.endOffset);
+            const secondText = document.createTextNode(textContent.slice(this.range.endOffset));
+            fragment.appendChild(span);
+            fragment.appendChild(secondText);
+          }
+          node.parentElement.replaceChild(fragment, node);
+        }
+        if (node.nodeName === "SPAN") {
+          setStyle(node as HTMLSpanElement, styles);
+          findSpanStyleRemove(node as HTMLSpanElement);
+        }
+        flag = !flag;
+      } else if (flag) {
+        if (node.nodeName === "SPAN") {
+          setStyle(node as HTMLSpanElement, styles);
+          node.childNodes.forEach((child) => {
+            if (child.nodeName === "SPAN") findSpanStyleRemove(child as HTMLSpanElement);
+          });
+        } else if (node.nodeName === "#text") {
+          span.textContent = node.textContent;
+          node.parentElement.replaceChild(span, node);
+        }
+      }
+
+      childNodes.map((child) => {
+        firstOrLastStyleChange(child, index);
+      });
+    };
+
     const elementNodeStyleChange = (node: HTMLDivElement, index: number) => {
       if (index === 0 || index === this.rangeNodes.length - 1) {
+        firstOrLastStyleChange(node, index);
       } else {
         const span = document.createElement("span");
         setStyle(span, styles);

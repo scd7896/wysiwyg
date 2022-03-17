@@ -84,7 +84,6 @@ export default class FontSize implements IComponent {
       if (FontSizeStore.state.isInputOpen) {
         FontSizeStore.closeInput();
       } else {
-        RangeSingleton.getInstance().tmpSave();
         FontSizeStore.openInput();
       }
     });
@@ -112,8 +111,9 @@ export default class FontSize implements IComponent {
     this.inputWrapper.addEventListener(
       "submit",
       onSubmit(({ inputValue }) => {
-        if (!isNaN(Number(input.value))) FontSizeStore.setFontSize(inputValue);
-        RangeSingleton.getInstance().fontSet({ "font-size": `${inputValue}px` });
+        if (!isNaN(Number(input.value))) {
+          FontSizeStore.setFontSize(inputValue);
+        }
         FontSizeStore.closeInput();
       }),
     );

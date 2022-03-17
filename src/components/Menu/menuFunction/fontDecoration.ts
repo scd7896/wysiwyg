@@ -1,5 +1,5 @@
 import { FontColorStore, FontDecorationStore, RangeSingleton } from "../../../model";
-import { findByTypeElement, setStyle } from "../../../utils/dom";
+import { findByTypeElement, hasContains, hasStyles, setStyle } from "../../../utils/dom";
 
 export default class FontDecoration {
   private wrapper: HTMLDivElement;
@@ -14,6 +14,7 @@ export default class FontDecoration {
     parent.appendChild(this.wrapper);
     FontColorStore.subscribe(this);
     FontDecorationStore.subscribe(this);
+    RangeSingleton.getInstance().subscribe(this);
     this.render();
   }
 
@@ -37,6 +38,11 @@ export default class FontDecoration {
 
   update() {
     this.buttons.map((button) => setStyle(button, { color: FontColorStore.state.color }));
+    if (RangeSingleton.getInstance().type === "Caret") {
+      const anchorNode = RangeSingleton.getInstance().anchorNode;
+
+      hasStyles("text-decoration-line", anchorNode);
+    }
   }
 
   private menuButtonRender(line: string) {
