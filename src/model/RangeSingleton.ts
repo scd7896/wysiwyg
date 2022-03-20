@@ -1,4 +1,11 @@
-import { hasContains, setStyle } from "../utils/dom";
+import {
+  findSpanStyleRemove,
+  hasContains,
+  setStyle,
+  setStyleEndContainer,
+  setStyleFullText,
+  setStyleStartContainer,
+} from "../utils/dom";
 import { BaseStore } from "./BaseStore";
 
 class RangeSingleton extends BaseStore<{}> {
@@ -18,6 +25,7 @@ class RangeSingleton extends BaseStore<{}> {
   tmpAnchorNode: Node;
 
   private static instance: RangeSingleton;
+
   private constructor(parent?: HTMLElement) {
     super({});
     this.parent = parent;
@@ -32,6 +40,7 @@ class RangeSingleton extends BaseStore<{}> {
       if (this.selection.type === "Range") {
         this.setRangeNode();
       }
+      console.log(this.rangeNodes, this.selection, this.range);
 
       this.setState({});
     });
@@ -114,7 +123,7 @@ class RangeSingleton extends BaseStore<{}> {
     const span = document.createElement("span");
     setStyle(span, styles);
     span.innerHTML = "&nbsp;";
-    RangeSingleton.getInstance().insertNodeAndFoucs(span);
+    this.insertNodeAndFoucs(span);
   }
 
   private oneTextNodeStyleChange(styles: Record<string, string>) {
@@ -139,72 +148,38 @@ class RangeSingleton extends BaseStore<{}> {
   }
 
   private rangeEventListener(styles: Record<string, string>) {
-    const styleKeys = Object.keys(styles);
-
-    const findSpanStyleRemove = (span: HTMLSpanElement) => {
-      styleKeys.map((key) => span.style.removeProperty(key));
-
-      span.childNodes.forEach((child) => {
-        if (child.nodeName === "SPAN") findSpanStyleRemove(child as HTMLSpanElement);
-      });
-
-      if (span.style.length === 0) {
-        const text = document.createTextNode(span.textContent);
-        span.parentElement.replaceChild(text, span);
-      }
-    };
-
     let flag = false;
 
-    const firstOrLastStyleChange = (node: Node, index: number) => {
-      const span = document.createElement("span");
-      setStyle(span, styles);
-      const childNodes: Node[] = [];
-      node.childNodes.forEach((child) => {
-        childNodes.push(child);
-      });
-      if (node === this.focusNode || node === this.anchorNode) {
-        if (node.nodeName === "#text") {
-          const fragment = document.createDocumentFragment();
-          const textContent = node.textContent;
-          if (index === 0) {
-            const firstText = document.createTextNode(textContent.slice(0, this.range.startOffset));
-            span.textContent = textContent.slice(this.range.startOffset);
-            fragment.appendChild(firstText);
-            fragment.appendChild(span);
-          } else {
-            span.textContent = textContent.slice(0, this.range.endOffset);
-            const secondText = document.createTextNode(textContent.slice(this.range.endOffset));
-            fragment.appendChild(span);
-            fragment.appendChild(secondText);
-          }
-          node.parentElement.replaceChild(fragment, node);
-        }
-        if (node.nodeName === "SPAN") {
-          setStyle(node as HTMLSpanElement, styles);
-          findSpanStyleRemove(node as HTMLSpanElement);
-        }
-        flag = !flag;
-      } else if (flag) {
-        if (node.nodeName === "SPAN") {
-          setStyle(node as HTMLSpanElement, styles);
-          node.childNodes.forEach((child) => {
-            if (child.nodeName === "SPAN") findSpanStyleRemove(child as HTMLSpanElement);
-          });
-        } else if (node.nodeName === "#text") {
-          span.textContent = node.textContent;
-          node.parentElement.replaceChild(span, node);
-        }
+    const changeNodesForFirstOrLast = (node: Node, index: number) => {
+      if (hasContains(node, this.range.startContainer)) {
+        flag = true;
+        setStyleStartContainer(this.range, styles);
+        return;
       }
 
-      childNodes.map((child) => {
-        firstOrLastStyleChange(child, index);
-      });
+      if (hasContains(node, this.range.endContainer)) {
+        setStyleEndContainer(this.range, styles);
+        flag = false;
+        return;
+      }
+
+      if (flag) {
+        if (node.nodeName === "#text") {
+          setStyleFullText(node, styles);
+        } else {
+          setStyle(node as HTMLSpanElement, styles);
+          node.childNodes.forEach((child) => {
+            if (child.nodeName !== "#text") {
+              findSpanStyleRemove(child as HTMLSpanElement, styles);
+            }
+          });
+        }
+      }
     };
 
     const elementNodeStyleChange = (node: HTMLDivElement, index: number) => {
       if (index === 0 || index === this.rangeNodes.length - 1) {
-        firstOrLastStyleChange(node, index);
+        node.childNodes.forEach((child) => changeNodesForFirstOrLast(child, index));
       } else {
         const span = document.createElement("span");
         setStyle(span, styles);
@@ -215,7 +190,7 @@ class RangeSingleton extends BaseStore<{}> {
         span.childNodes.forEach((child) => {
           if (child.nodeName === "SPAN") spanChilds.push(child as HTMLSpanElement);
         });
-        spanChilds.map((span) => findSpanStyleRemove(span));
+        spanChilds.map((span) => findSpanStyleRemove(span, styles));
       }
     };
     console.log(this.rangeNodes, this.selection, this.range);
