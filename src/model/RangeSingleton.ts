@@ -179,7 +179,12 @@ class RangeSingleton extends BaseStore<{}> {
 
     const elementNodeStyleChange = (node: HTMLDivElement, index: number) => {
       if (index === 0 || index === this.rangeNodes.length - 1) {
-        node.childNodes.forEach((child) => changeNodesForFirstOrLast(child, index));
+        const childNodes: Node[] = [];
+        node.childNodes.forEach((child) => {
+          childNodes.push(child);
+        });
+
+        childNodes.map((childNode, index) => changeNodesForFirstOrLast(childNode, index));
       } else {
         const span = document.createElement("span");
         setStyle(span, styles);

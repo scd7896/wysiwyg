@@ -33,33 +33,48 @@ export const setStyleFullText = (node: Node, styles: Record<string, string>) => 
 };
 
 export const setStyleStartContainer = (range: Range, styles: Record<string, string>) => {
-  console.log(range);
   const contains = range.startContainer;
-  const textContent = contains.textContent;
-  const fragment = document.createDocumentFragment();
-  const text = document.createTextNode(textContent.slice(0, range.startOffset));
-  const span = document.createElement("span");
-  span.textContent = textContent.slice(range.startOffset);
-  setStyle(span, styles);
-  fragment.appendChild(text);
-  fragment.appendChild(span);
-  console.dir(text);
-  console.dir(span);
-  contains.parentElement.replaceChild(fragment, contains);
+  if (contains.nodeName === "#text") {
+    const textContent = contains.textContent;
+    const fragment = document.createDocumentFragment();
+    const text = document.createTextNode(textContent.slice(0, range.startOffset));
+    const span = document.createElement("span");
+    span.textContent = textContent.slice(range.startOffset);
+    setStyle(span, styles);
+    fragment.appendChild(text);
+    fragment.appendChild(span);
+    contains.parentElement.replaceChild(fragment, contains);
+  } else {
+    setStyle(contains as HTMLElement, styles);
+    contains.childNodes.forEach((child) => {
+      if (child.nodeName !== "#text") {
+        findSpanStyleRemove(child as HTMLSpanElement, styles);
+      }
+    });
+  }
 };
 
 export const setStyleEndContainer = (range: Range, styles: Record<string, string>) => {
   console.log(range);
   const contains = range.endContainer;
-  const textContent = contains.textContent;
-  const fragment = document.createDocumentFragment();
-  const span = document.createElement("span");
-  setStyle(span, styles);
-  span.textContent = textContent.slice(0, range.endOffset);
-  const text = document.createTextNode(textContent.slice(range.endOffset));
-  fragment.appendChild(span);
-  fragment.appendChild(text);
-  contains.parentElement.replaceChild(fragment, contains);
+  if (contains.nodeName === "#text") {
+    const textContent = contains.textContent;
+    const fragment = document.createDocumentFragment();
+    const span = document.createElement("span");
+    setStyle(span, styles);
+    span.textContent = textContent.slice(0, range.endOffset);
+    const text = document.createTextNode(textContent.slice(range.endOffset));
+    fragment.appendChild(span);
+    fragment.appendChild(text);
+    contains.parentElement.replaceChild(fragment, contains);
+  } else {
+    setStyle(contains as HTMLElement, styles);
+    contains.childNodes.forEach((child) => {
+      if (child.nodeName !== "#text") {
+        findSpanStyleRemove(child as HTMLSpanElement, styles);
+      }
+    });
+  }
 };
 
 export const setStyle = (node: HTMLElement, style: Record<string, string>) => {
