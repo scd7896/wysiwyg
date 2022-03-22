@@ -4,7 +4,7 @@ import {
   setStyle,
   setStyleEndContainer,
   setStyleFullText,
-  setStyleStartContainer,
+  setRangeContainerStyle,
 } from "../utils/dom";
 import { BaseStore } from "./BaseStore";
 
@@ -153,12 +153,12 @@ class RangeSingleton extends BaseStore<{}> {
     const changeNodesForFirstOrLast = (node: Node, index: number) => {
       if (hasContains(node, this.range.startContainer)) {
         flag = true;
-        setStyleStartContainer(this.range, styles);
+        setRangeContainerStyle(this.range, node, styles, true);
         return;
       }
 
       if (hasContains(node, this.range.endContainer)) {
-        setStyleEndContainer(this.range, styles);
+        setRangeContainerStyle(this.range, node, styles, false);
         flag = false;
         return;
       }
@@ -184,7 +184,10 @@ class RangeSingleton extends BaseStore<{}> {
           childNodes.push(child);
         });
 
-        childNodes.map((childNode, index) => changeNodesForFirstOrLast(childNode, index));
+        childNodes.map((childNode, index) => {
+          console.dir(childNode);
+          changeNodesForFirstOrLast(childNode, index);
+        });
       } else {
         const span = document.createElement("span");
         setStyle(span, styles);
