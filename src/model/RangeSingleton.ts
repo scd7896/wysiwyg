@@ -46,28 +46,6 @@ class RangeSingleton extends BaseStore<{}> {
     });
   }
 
-  private setRangeNode() {
-    let flag = false;
-    const board = this.parent.querySelector(".board");
-    this.rangeNodes = [];
-
-    board.childNodes.forEach((child) => {
-      if (flag) {
-        this.rangeNodes.push(child);
-      }
-
-      if (hasContains(child, this.selection.anchorNode)) {
-        if (!flag) this.rangeNodes.push(child);
-        flag = !flag;
-      }
-
-      if (hasContains(child, this.selection.focusNode)) {
-        if (!flag) this.rangeNodes.push(child);
-        flag = !flag;
-      }
-    });
-  }
-
   static getInstance(parent?: HTMLElement) {
     if (this.instance) return this.instance;
     this.instance = new this(parent);
@@ -75,12 +53,7 @@ class RangeSingleton extends BaseStore<{}> {
   }
 
   fontSet(styles: Record<string, string>) {
-    this.selection = this.tmpFocusSelection || this.selection;
-    this.range = this.tmpFocusRange || this.range;
-    this.type = this.tmpFocusType || this.type;
-    this.rangeNodes = this.tmpRangeNodes || this.rangeNodes;
-    this.focusNode = this.tmpFocusNode || this.focusNode;
-    this.anchorNode = this.tmpAnchorNode || this.anchorNode;
+    this.loadTmp();
     if (this.tmpFocusType === "Range") {
       this.setRangeNode();
     }
@@ -91,13 +64,15 @@ class RangeSingleton extends BaseStore<{}> {
     if (this.type === "Caret") {
       this.caretEventListener(styles);
     }
+    this.initializeTmp();
+  }
 
-    this.tmpFocusSelection = undefined;
-    this.tmpFocusRange = undefined;
-    this.tmpFocusType = undefined;
-    this.tmpRangeNodes = undefined;
-    this.tmpFocusNode = undefined;
-    this.tmpAnchorNode = undefined;
+  insertImage(src: string) {
+    this.loadTmp();
+    const img = document.createElement("img");
+    img.src = src;
+    this.insertNodeAndFoucs(img);
+    this.initializeTmp();
   }
 
   tmpSave() {
@@ -107,6 +82,24 @@ class RangeSingleton extends BaseStore<{}> {
     this.tmpRangeNodes = this.rangeNodes;
     this.tmpFocusNode = this.focusNode;
     this.tmpAnchorNode = this.anchorNode;
+  }
+
+  initializeTmp() {
+    this.tmpFocusSelection = undefined;
+    this.tmpFocusRange = undefined;
+    this.tmpFocusType = undefined;
+    this.tmpRangeNodes = undefined;
+    this.tmpFocusNode = undefined;
+    this.tmpAnchorNode = undefined;
+  }
+
+  private loadTmp() {
+    this.selection = this.tmpFocusSelection || this.selection;
+    this.range = this.tmpFocusRange || this.range;
+    this.type = this.tmpFocusType || this.type;
+    this.rangeNodes = this.tmpRangeNodes || this.rangeNodes;
+    this.focusNode = this.tmpFocusNode || this.focusNode;
+    this.anchorNode = this.tmpAnchorNode || this.anchorNode;
   }
 
   private insertNodeAndFoucs(node: HTMLElement) {
@@ -209,6 +202,28 @@ class RangeSingleton extends BaseStore<{}> {
     } else {
       this.oneTextNodeStyleChange(styles);
     }
+  }
+
+  private setRangeNode() {
+    let flag = false;
+    const board = this.parent.querySelector(".board");
+    this.rangeNodes = [];
+
+    board.childNodes.forEach((child) => {
+      if (flag) {
+        this.rangeNodes.push(child);
+      }
+
+      if (hasContains(child, this.selection.anchorNode)) {
+        if (!flag) this.rangeNodes.push(child);
+        flag = !flag;
+      }
+
+      if (hasContains(child, this.selection.focusNode)) {
+        if (!flag) this.rangeNodes.push(child);
+        flag = !flag;
+      }
+    });
   }
 }
 
