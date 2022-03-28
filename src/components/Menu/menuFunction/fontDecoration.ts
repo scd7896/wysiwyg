@@ -25,7 +25,6 @@ export default class FontDecoration {
 
     this.wrapper.addEventListener("click", (e: any) => {
       const target = findByTypeElement(e.target, "line");
-      console.log(target);
       if (target) {
         const lineStyle = target.dataset.value;
 

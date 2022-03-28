@@ -111,7 +111,6 @@ export const setRangeContainerStyle = (range: Range, node: Node, styles: Record<
 };
 
 export const setStyleEndContainer = (range: Range, node: Node, styles: Record<string, string>) => {
-  console.log(range);
   const contains = range.endContainer;
   if (contains.nodeName === "#text") {
     const fragment = splitTextStyle(node, range.startOffset, 1, styles);

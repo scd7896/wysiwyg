@@ -31,7 +31,7 @@ class RangeSingleton extends BaseStore<{}> {
     this.parent = parent;
     this.rangeNodes = [];
 
-    document.addEventListener("selectionchange", () => {
+    document.addEventListener("selectionchange", (e) => {
       this.selection = document.getSelection();
       this.type = this.selection.type;
       this.range = this.selection.getRangeAt(0);
@@ -40,31 +40,8 @@ class RangeSingleton extends BaseStore<{}> {
       if (this.selection.type === "Range") {
         this.setRangeNode();
       }
-      console.log(this.rangeNodes, this.selection, this.range);
 
       this.setState({});
-    });
-  }
-
-  private setRangeNode() {
-    let flag = false;
-    const board = this.parent.querySelector(".board");
-    this.rangeNodes = [];
-
-    board.childNodes.forEach((child) => {
-      if (flag) {
-        this.rangeNodes.push(child);
-      }
-
-      if (hasContains(child, this.selection.anchorNode)) {
-        if (!flag) this.rangeNodes.push(child);
-        flag = !flag;
-      }
-
-      if (hasContains(child, this.selection.focusNode)) {
-        if (!flag) this.rangeNodes.push(child);
-        flag = !flag;
-      }
     });
   }
 
@@ -75,12 +52,7 @@ class RangeSingleton extends BaseStore<{}> {
   }
 
   fontSet(styles: Record<string, string>) {
-    this.selection = this.tmpFocusSelection || this.selection;
-    this.range = this.tmpFocusRange || this.range;
-    this.type = this.tmpFocusType || this.type;
-    this.rangeNodes = this.tmpRangeNodes || this.rangeNodes;
-    this.focusNode = this.tmpFocusNode || this.focusNode;
-    this.anchorNode = this.tmpAnchorNode || this.anchorNode;
+    this.loadTmp();
     if (this.tmpFocusType === "Range") {
       this.setRangeNode();
     }
@@ -91,13 +63,18 @@ class RangeSingleton extends BaseStore<{}> {
     if (this.type === "Caret") {
       this.caretEventListener(styles);
     }
+    this.initializeTmp();
+  }
 
-    this.tmpFocusSelection = undefined;
-    this.tmpFocusRange = undefined;
-    this.tmpFocusType = undefined;
-    this.tmpRangeNodes = undefined;
-    this.tmpFocusNode = undefined;
-    this.tmpAnchorNode = undefined;
+  insertImage(src: string) {
+    this.loadTmp();
+    const img = document.createElement("img");
+    img.src = src;
+    setStyle(img, {
+      "max-width": "100%",
+    });
+    this.insertNodeAndFoucs(img);
+    this.initializeTmp();
   }
 
   tmpSave() {
@@ -107,6 +84,24 @@ class RangeSingleton extends BaseStore<{}> {
     this.tmpRangeNodes = this.rangeNodes;
     this.tmpFocusNode = this.focusNode;
     this.tmpAnchorNode = this.anchorNode;
+  }
+
+  initializeTmp() {
+    this.tmpFocusSelection = undefined;
+    this.tmpFocusRange = undefined;
+    this.tmpFocusType = undefined;
+    this.tmpRangeNodes = undefined;
+    this.tmpFocusNode = undefined;
+    this.tmpAnchorNode = undefined;
+  }
+
+  private loadTmp() {
+    this.selection = this.tmpFocusSelection || this.selection;
+    this.range = this.tmpFocusRange || this.range;
+    this.type = this.tmpFocusType || this.type;
+    this.rangeNodes = this.tmpRangeNodes || this.rangeNodes;
+    this.focusNode = this.tmpFocusNode || this.focusNode;
+    this.anchorNode = this.tmpAnchorNode || this.anchorNode;
   }
 
   private insertNodeAndFoucs(node: HTMLElement) {
@@ -201,7 +196,6 @@ class RangeSingleton extends BaseStore<{}> {
         spanChilds.map((span) => findSpanStyleRemove(span, styles));
       }
     };
-    console.log(this.rangeNodes, this.selection, this.range);
     if (this.anchorNode !== this.focusNode) {
       this.rangeNodes.map((node, index) => {
         elementNodeStyleChange(node as HTMLDivElement, index);
@@ -209,6 +203,28 @@ class RangeSingleton extends BaseStore<{}> {
     } else {
       this.oneTextNodeStyleChange(styles);
     }
+  }
+
+  private setRangeNode() {
+    let flag = false;
+    const board = this.parent.querySelector(".board");
+    this.rangeNodes = [];
+
+    board.childNodes.forEach((child) => {
+      if (flag) {
+        this.rangeNodes.push(child);
+      }
+
+      if (hasContains(child, this.selection.anchorNode)) {
+        if (!flag) this.rangeNodes.push(child);
+        flag = !flag;
+      }
+
+      if (hasContains(child, this.selection.focusNode)) {
+        if (!flag) this.rangeNodes.push(child);
+        flag = !flag;
+      }
+    });
   }
 }
 
