@@ -9,8 +9,11 @@ export default class Image implements IComponent {
   private imageForm: HTMLFormElement;
   private headerNav: HTMLDivElement;
   private footerNav: HTMLDivElement;
+  private formBody: HTMLDivElement;
+  private imageOptions?: any;
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, options?: any) {
+    this.imageOptions = options?.image;
     this.parent = parent;
     this.wrapper = document.createElement("div");
     this.toggleButton = document.createElement("button");
@@ -25,6 +28,8 @@ export default class Image implements IComponent {
       button.dataset.value = type;
     });
 
+    this.formBody = document.createElement("div");
+
     this.footerNav = document.createElement("div");
     const submitButton = document.createElement("button");
     submitButton.textContent = "insert";
@@ -32,6 +37,7 @@ export default class Image implements IComponent {
     this.footerNav.appendChild(submitButton);
 
     this.imageForm.appendChild(this.headerNav);
+    this.imageForm.appendChild(this.formBody);
     this.imageForm.appendChild(this.footerNav);
 
     this.wrapper.appendChild(this.toggleButton);
@@ -43,6 +49,7 @@ export default class Image implements IComponent {
   }
 
   update() {
+    console.log(ImageStore.state);
     if (ImageStore.state.isMenuOpen) {
       setStyle(this.imageForm, {
         display: "block",
@@ -55,6 +62,7 @@ export default class Image implements IComponent {
       RangeSingleton.getInstance().initializeTmp();
     }
     this.renderHeaderNav();
+    this.renderFormBody();
     this.renderFooterNav();
   }
 
@@ -76,6 +84,7 @@ export default class Image implements IComponent {
     });
 
     this.renderHeaderNav();
+    this.renderFormBody();
     this.renderFooterNav();
 
     this.toggleButton.textContent = "image";
@@ -141,4 +150,34 @@ export default class Image implements IComponent {
       });
     }
   }
+
+  renderFormBody() {
+    const fragment = document.createDocumentFragment();
+    this.formBody.innerHTML = "";
+    let input = document.createElement("input");
+    if (ImageStore.state.mode === "file") {
+      input.type = "file";
+      input.name = "file";
+      input.addEventListener("change", async (e: any) => {
+        let url = "";
+        if (this.imageOptions?.onUploadSingle) {
+          url = await this.imageOptions.onUploadSingle(e.target.files[0]);
+        } else {
+          url = URL.createObjectURL(e.target.files[0]);
+        }
+        this.insertImage(url);
+        ImageStore.closeMenu();
+      });
+    } else {
+      input.type = "text";
+      input.name = "url";
+    }
+    fragment.appendChild(input);
+    this.formBody.appendChild(fragment);
+  }
+
+  insertImage = (url: string) => {
+    RangeSingleton.getInstance().insertImage(url);
+    ImageStore.closeMenu();
+  };
 }

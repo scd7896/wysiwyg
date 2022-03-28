@@ -71,6 +71,9 @@ class RangeSingleton extends BaseStore<{}> {
     this.loadTmp();
     const img = document.createElement("img");
     img.src = src;
+    setStyle(img, {
+      "max-width": "100%",
+    });
     this.insertNodeAndFoucs(img);
     this.initializeTmp();
   }

@@ -30,6 +30,7 @@ class ImageStore extends BaseStore<ImageState> {
   }
 
   closeMenu() {
+    console.log("closeRequest");
     this.setState({
       isMenuOpen: false,
     });
