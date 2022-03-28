@@ -7,10 +7,12 @@ export class BaseStore<T> {
   private listeners: IComponent[];
   static timer: number;
   public state: T;
+  static activeListeners: IComponent[];
 
   constructor(defaultState: T) {
     this.listeners = [];
     this.state = defaultState;
+    BaseStore.activeListeners = [];
   }
 
   setState(nextState: Partial<T>) {
@@ -18,12 +20,18 @@ export class BaseStore<T> {
       ...this.state,
       ...nextState,
     };
+    this.listeners.map((listener) => {
+      if (BaseStore.activeListeners.find((activeListener) => activeListener === listener)) {
+        return;
+      }
+      BaseStore.activeListeners.push(listener);
+    });
     if (BaseStore.timer) {
       clearTimeout(BaseStore.timer);
       BaseStore.timer = 0;
     }
     BaseStore.timer = setTimeout(() => {
-      this.listeners.map((listener) => listener.update());
+      BaseStore.activeListeners.map((listener) => listener.update());
     }, 1);
   }
 

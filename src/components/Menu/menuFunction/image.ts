@@ -49,7 +49,6 @@ export default class Image implements IComponent {
   }
 
   update() {
-    console.log(ImageStore.state);
     if (ImageStore.state.isMenuOpen) {
       setStyle(this.imageForm, {
         display: "block",
