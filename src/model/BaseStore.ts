@@ -32,6 +32,7 @@ export class BaseStore<T> {
     }
     BaseStore.timer = setTimeout(() => {
       BaseStore.activeListeners.map((listener) => listener.update());
+      BaseStore.activeListeners = [];
     }, 1);
   }
 
