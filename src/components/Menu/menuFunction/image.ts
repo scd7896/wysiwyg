@@ -1,3 +1,4 @@
+import { onSubmit } from "web-form-helper";
 import { ImageStore, RangeSingleton } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { findByTypeElement, setStyle } from "../../../utils/dom";
@@ -41,6 +42,7 @@ export default class Image implements IComponent {
     this.imageForm.appendChild(this.footerNav);
 
     this.wrapper.appendChild(this.toggleButton);
+    this.wrapper.dataset.type = "imageWrapper";
     this.wrapper.appendChild(this.imageForm);
 
     this.parent.appendChild(this.wrapper);
@@ -48,17 +50,24 @@ export default class Image implements IComponent {
     ImageStore.subscribe(this);
   }
 
+  private clickOutSide = (e: any) => {
+    const target = findByTypeElement(e.target, "imageWrapper");
+    if (!target) ImageStore.closeMenu();
+  };
+
   update() {
     if (ImageStore.state.isMenuOpen) {
       setStyle(this.imageForm, {
         display: "block",
       });
       RangeSingleton.getInstance().tmpSave();
+      document.addEventListener("click", this.clickOutSide);
     } else {
       setStyle(this.imageForm, {
         display: "none",
       });
       RangeSingleton.getInstance().initializeTmp();
+      document.removeEventListener("click", this.clickOutSide);
     }
     this.renderHeaderNav();
     this.renderFormBody();
@@ -97,6 +106,14 @@ export default class Image implements IComponent {
         ImageStore.setMode(target.dataset.value as any);
       }
     });
+
+    this.imageForm.addEventListener(
+      "submit",
+      onSubmit(({ url }) => {
+        this.insertImage(url);
+        ImageStore.closeMenu();
+      }),
+    );
   }
 
   renderHeaderNav() {

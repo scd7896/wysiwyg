@@ -31,7 +31,7 @@ class RangeSingleton extends BaseStore<{}> {
     this.parent = parent;
     this.rangeNodes = [];
 
-    document.addEventListener("selectionchange", () => {
+    document.addEventListener("selectionchange", (e) => {
       this.selection = document.getSelection();
       this.type = this.selection.type;
       this.range = this.selection.getRangeAt(0);
@@ -40,7 +40,6 @@ class RangeSingleton extends BaseStore<{}> {
       if (this.selection.type === "Range") {
         this.setRangeNode();
       }
-      console.log(this.rangeNodes, this.selection, this.range);
 
       this.setState({});
     });
@@ -197,7 +196,6 @@ class RangeSingleton extends BaseStore<{}> {
         spanChilds.map((span) => findSpanStyleRemove(span, styles));
       }
     };
-    console.log(this.rangeNodes, this.selection, this.range);
     if (this.anchorNode !== this.focusNode) {
       this.rangeNodes.map((node, index) => {
         elementNodeStyleChange(node as HTMLDivElement, index);
