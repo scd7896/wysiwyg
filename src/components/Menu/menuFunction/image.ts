@@ -1,7 +1,7 @@
 import { onSubmit } from "web-form-helper";
 import { ImageStore, RangeSingleton } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
-import { findByTypeElement, setStyle } from "../../../utils/dom";
+import { findElementByType, setStyle } from "../../../utils/dom";
 
 export default class Image implements IComponent {
   private parent: HTMLElement;
@@ -51,7 +51,7 @@ export default class Image implements IComponent {
   }
 
   private clickOutSide = (e: any) => {
-    const target = findByTypeElement(e.target, "imageWrapper");
+    const target = findElementByType(e.target, "imageWrapper");
     if (!target) ImageStore.closeMenu();
   };
 
@@ -101,7 +101,7 @@ export default class Image implements IComponent {
     });
 
     this.headerNav.addEventListener("click", (e) => {
-      const target = findByTypeElement(e.target as HTMLElement, "type");
+      const target = findElementByType(e.target as HTMLElement, "type");
       if (target) {
         ImageStore.setMode(target.dataset.value as any);
       }

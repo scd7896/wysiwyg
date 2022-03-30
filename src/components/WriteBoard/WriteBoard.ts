@@ -32,8 +32,11 @@ export default class WriteBoard implements IComponent {
         this.createDummyDiv();
       }
     });
+    this.board.addEventListener("click", this.clickEventListener);
     this.createDummyDiv();
   }
+
+  private clickEventListener = (e: any) => {};
 
   private createDummyDiv() {
     const dummyDiv = document.createElement("div");

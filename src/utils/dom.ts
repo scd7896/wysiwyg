@@ -130,7 +130,7 @@ export const setStyle = (node: HTMLElement, style: Record<string, string>) => {
   keys.map((key) => node.style.setProperty(key, style[key]));
 };
 
-export const findByTypeElement = (target: HTMLElement, type: string) => {
+export const findElementByType = (target: HTMLElement, type: string) => {
   let tmpTarget = target;
   while (tmpTarget) {
     if (tmpTarget.dataset.type === type) return tmpTarget;
