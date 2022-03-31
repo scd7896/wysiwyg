@@ -1,5 +1,5 @@
 import { IComponent } from "../../model/BaseStore";
-import { setStyle } from "../../utils/dom";
+import { findImageByParentNode, setStyle } from "../../utils/dom";
 
 export default class WriteBoard implements IComponent {
   private board: HTMLElement;
@@ -36,7 +36,12 @@ export default class WriteBoard implements IComponent {
     this.createDummyDiv();
   }
 
-  private clickEventListener = (e: any) => {};
+  private clickEventListener = (e: any) => {
+    const img = findImageByParentNode(e.target);
+    if (img) {
+      console.dir(img.getClientRects());
+    }
+  };
 
   private createDummyDiv() {
     const dummyDiv = document.createElement("div");

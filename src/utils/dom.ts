@@ -138,3 +138,12 @@ export const findElementByType = (target: HTMLElement, type: string) => {
   }
   return null;
 };
+
+export const findImageByParentNode = (target: HTMLElement) => {
+  let tmpTarget = target;
+  while (tmpTarget) {
+    if (tmpTarget.nodeName === "IMG") return tmpTarget;
+    tmpTarget = tmpTarget.parentElement;
+  }
+  return null;
+};
