@@ -1,5 +1,5 @@
 import { FontColorStore, FontDecorationStore, RangeSingleton } from "../../../model";
-import { findByTypeElement, hasContains, hasStyles, setStyle } from "../../../utils/dom";
+import { findElementByType, hasStyles, setStyle } from "../../../utils/dom";
 
 export default class FontDecoration {
   private wrapper: HTMLDivElement;
@@ -24,7 +24,7 @@ export default class FontDecoration {
     });
 
     this.wrapper.addEventListener("click", (e: any) => {
-      const target = findByTypeElement(e.target, "line");
+      const target = findElementByType(e.target, "line");
       if (target) {
         const lineStyle = target.dataset.value;
 

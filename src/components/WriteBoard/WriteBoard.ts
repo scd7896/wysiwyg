@@ -1,5 +1,6 @@
+import { ImageResizerStore } from "../../model";
 import { IComponent } from "../../model/BaseStore";
-import { setStyle } from "../../utils/dom";
+import { findImageByParentNode, setStyle } from "../../utils/dom";
 
 export default class WriteBoard implements IComponent {
   private board: HTMLElement;
@@ -32,8 +33,18 @@ export default class WriteBoard implements IComponent {
         this.createDummyDiv();
       }
     });
+    this.board.addEventListener("click", this.clickEventListener);
     this.createDummyDiv();
   }
+
+  private clickEventListener = (e: any) => {
+    const img = findImageByParentNode(e.target);
+    if (img) {
+      ImageResizerStore.setSelectedImage(img as HTMLImageElement);
+    } else {
+      ImageResizerStore.setInitlization();
+    }
+  };
 
   private createDummyDiv() {
     const dummyDiv = document.createElement("div");
