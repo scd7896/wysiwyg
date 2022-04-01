@@ -1,8 +1,11 @@
 import { ImageResizerStore } from "../model";
-import { setStyle } from "../utils/dom";
+import { findElementByType, setStyle } from "../utils/dom";
 
 export default class ImageResizer {
   private wrapper: HTMLDivElement;
+  private startPosition: "left" | "right";
+  private currentXPoint: number;
+
   constructor(parent: Element) {
     this.wrapper = document.createElement("div");
     [
@@ -21,12 +24,18 @@ export default class ImageResizer {
         transform: "translate(-50%, -50%)",
         "border-radius": "100%",
       });
+      point.dataset.type = "point";
+      point.dataset.value = position.left === "100%" ? "right" : "left";
       this.wrapper.appendChild(point);
     });
 
     parent.appendChild(this.wrapper);
     this.render();
     ImageResizerStore.subscribe(this);
+    this.wrapper.addEventListener("mousedown", this.mouseDownEventListener);
+    this.wrapper.addEventListener("mousemove", this.mouseMoveEventListener);
+    parent.addEventListener("mouseup", this.mouseUpEventListener);
+    parent.addEventListener("mouseleave", this.mouseUpEventListener);
   }
 
   update() {
@@ -56,4 +65,53 @@ export default class ImageResizer {
       border: "1px solid blue",
     });
   }
+
+  mouseDownEventListener = (event: MouseEvent) => {
+    event.preventDefault();
+    const pointElement = findElementByType(event.target as HTMLElement, "point");
+    const targetImage = ImageResizerStore.state.selectedImage;
+    if (!pointElement || !targetImage) return;
+
+    const width = targetImage.style.getPropertyPriority("width");
+    if (!width) {
+      const percent = (targetImage.width / targetImage.parentElement.clientWidth) * 100;
+      targetImage.style.setProperty("width", `${percent}%`);
+    }
+
+    this.startPosition = pointElement.dataset.value as "right" | "left";
+    this.currentXPoint = event.x;
+  };
+
+  mouseMoveEventListener = (event: MouseEvent) => {
+    event.preventDefault();
+    const targetImage = ImageResizerStore.state.selectedImage;
+    if (!this.startPosition) return;
+    if (targetImage) {
+      const width = targetImage.style.getPropertyValue("width");
+      const [percentText] = width.split("%");
+      const percentNumber = Number(percentText);
+      let calculatePercent = 0;
+      if (this.startPosition === "left") {
+        const nextDiff = this.currentXPoint - event.x > 0 ? 0.1 : 0.1 * -1;
+        calculatePercent = percentNumber + nextDiff;
+      } else {
+        console.log(event.x - this.currentXPoint);
+        const nextDiff = event.x - this.currentXPoint > 0 ? 0.1 : 0.1 * -1;
+        calculatePercent = percentNumber + nextDiff;
+      }
+      console.log(event);
+
+      if (calculatePercent > 100) calculatePercent = 100;
+      if (calculatePercent < 4) calculatePercent = 4;
+      targetImage.style.setProperty("width", `${calculatePercent}%`);
+      this.update();
+    }
+    this.currentXPoint = event.x;
+  };
+
+  mouseUpEventListener = (event: MouseEvent) => {
+    event.preventDefault();
+    this.startPosition = undefined;
+    this.currentXPoint = undefined;
+  };
 }
