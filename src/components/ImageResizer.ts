@@ -95,11 +95,9 @@ export default class ImageResizer {
         const nextDiff = this.currentXPoint - event.x > 0 ? 0.1 : 0.1 * -1;
         calculatePercent = percentNumber + nextDiff;
       } else {
-        console.log(event.x - this.currentXPoint);
         const nextDiff = event.x - this.currentXPoint > 0 ? 0.1 : 0.1 * -1;
         calculatePercent = percentNumber + nextDiff;
       }
-      console.log(event);
 
       if (calculatePercent > 100) calculatePercent = 100;
       if (calculatePercent < 4) calculatePercent = 4;

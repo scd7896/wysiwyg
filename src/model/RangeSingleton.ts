@@ -180,7 +180,6 @@ class RangeSingleton extends BaseStore<{}> {
         });
 
         childNodes.map((childNode, index) => {
-          console.dir(childNode);
           changeNodesForFirstOrLast(childNode, index);
         });
       } else {
