@@ -1,11 +1,4 @@
-import {
-  findSpanStyleRemove,
-  hasContains,
-  setStyle,
-  setStyleEndContainer,
-  setStyleFullText,
-  setRangeContainerStyle,
-} from "../utils/dom";
+import { findSpanStyleRemove, hasContains, setStyle, setStyleFullText, setRangeContainerStyle } from "../utils/dom";
 import { BaseStore } from "./BaseStore";
 
 class RangeSingleton extends BaseStore<{}> {

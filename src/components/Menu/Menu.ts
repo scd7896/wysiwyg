@@ -11,13 +11,19 @@ const menuClass = css`
   div + div {
     margin-left: 8px;
   }
+  position: sticky;
+  top: 0;
+  left: 0;
+  background: white;
+  border-bottom: 1px solid black;
 `;
 export default class Menu implements IComponent {
   private parent: Element;
-  private chlidren: IComponent[];
+  private options: any;
 
-  constructor(parent: Element) {
+  constructor(parent: Element, options?: any) {
     this.parent = parent;
+    this.options = options;
     this.render();
     menuStore.subscribe(this);
   }
@@ -27,7 +33,7 @@ export default class Menu implements IComponent {
     menu.classList.add(menuClass);
     const menuFunctionList = menuFunction as any;
     const keys = Object.keys(menuFunction) as Array<keyof MenuState>;
-    this.chlidren = keys.map((key) => new menuFunctionList[key](menu));
+    keys.map((key) => new menuFunctionList[key](menu, this.options));
     this.parent.appendChild(menu);
   }
 }
