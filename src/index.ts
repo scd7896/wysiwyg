@@ -10,7 +10,7 @@ export class WYSIWYG {
       "box-sizing": "border-box",
       position: "relative",
     });
-    new Menu(element);
+    new Menu(element, options);
     new WriteBoard(element);
     new ImageResizer(element);
   }

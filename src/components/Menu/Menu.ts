@@ -14,10 +14,11 @@ const menuClass = css`
 `;
 export default class Menu implements IComponent {
   private parent: Element;
-  private chlidren: IComponent[];
+  private options: any;
 
-  constructor(parent: Element) {
+  constructor(parent: Element, options?: any) {
     this.parent = parent;
+    this.options = options;
     this.render();
     menuStore.subscribe(this);
   }
@@ -27,7 +28,7 @@ export default class Menu implements IComponent {
     menu.classList.add(menuClass);
     const menuFunctionList = menuFunction as any;
     const keys = Object.keys(menuFunction) as Array<keyof MenuState>;
-    this.chlidren = keys.map((key) => new menuFunctionList[key](menu));
+    keys.map((key) => new menuFunctionList[key](menu, this.options));
     this.parent.appendChild(menu);
   }
 }
