@@ -11,6 +11,11 @@ const menuClass = css`
   div + div {
     margin-left: 8px;
   }
+  position: sticky;
+  top: 0;
+  left: 0;
+  background: white;
+  border-bottom: 1px solid black;
 `;
 export default class Menu implements IComponent {
   private parent: Element;
