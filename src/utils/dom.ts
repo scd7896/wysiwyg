@@ -9,7 +9,29 @@ export const hasContains = (wrapper: HTMLElement | Node, target: HTMLElement | N
   return result;
 };
 
-export const hasStyles = (style: string, target: HTMLElement | Node) => {};
+export const removeStyles = (target: HTMLElement | Node, key: string, value: string) => {
+  let tmpTarget = target;
+
+  while (tmpTarget) {
+    if (tmpTarget instanceof HTMLElement) {
+      if (tmpTarget.style.getPropertyValue(key) === value) tmpTarget.style.removeProperty(key);
+    }
+    tmpTarget = tmpTarget.parentElement;
+  }
+};
+
+export const getParentStyleValues = (target: HTMLElement | Node, style: string) => {
+  let tmpTarget = target;
+  const result: Record<string, number> = {};
+  while (tmpTarget) {
+    if (tmpTarget instanceof HTMLElement) {
+      result[tmpTarget.style.getPropertyValue(style)] = 1;
+    }
+    tmpTarget = tmpTarget.parentElement;
+  }
+
+  return Object.keys(result);
+};
 
 export const findSpanStyleRemove = (span: HTMLSpanElement, styles: Record<string, string>) => {
   const styleKeys = Object.keys(styles);

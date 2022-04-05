@@ -1,5 +1,5 @@
 import { FontColorStore, FontDecorationStore, RangeSingleton } from "../../../model";
-import { findElementByType, hasStyles, setStyle } from "../../../utils/dom";
+import { findElementByType, removeStyles, setStyle } from "../../../utils/dom";
 
 export default class FontDecoration {
   private wrapper: HTMLDivElement;
@@ -22,28 +22,44 @@ export default class FontDecoration {
     setStyle(this.wrapper, {
       position: "relative",
     });
+    this.renderButtons();
 
     this.wrapper.addEventListener("click", (e: any) => {
       const target = findElementByType(e.target, "line");
       if (target) {
         const lineStyle = target.dataset.value;
-
-        RangeSingleton.getInstance().fontSet({
-          "text-decoration-line": lineStyle,
-        });
+        const textDecorationValues = RangeSingleton.getInstance().state.textDecorationValues;
+        if (textDecorationValues?.find((styleValue) => lineStyle === styleValue)) {
+          removeStyles(RangeSingleton.getInstance().anchorNode, "text-decoration-line", lineStyle);
+        } else {
+          RangeSingleton.getInstance().fontSet({
+            "text-decoration-line": lineStyle,
+          });
+        }
       }
     });
   }
 
   update() {
     this.buttons.map((button) => setStyle(button, { color: FontColorStore.state.color }));
-    if (RangeSingleton.getInstance().type === "Caret") {
-      const anchorNode = RangeSingleton.getInstance().anchorNode;
-
-      hasStyles("text-decoration-line", anchorNode);
-    }
+    const textDecorationValues = RangeSingleton.getInstance().state.textDecorationValues;
+    this.renderButtons(textDecorationValues);
   }
 
+  renderButtons(textDecorationValues?: string[]) {
+    this.buttons.map((button) => {
+      const lineStyle = button.dataset.value;
+      if (textDecorationValues?.find((styleValue) => lineStyle === styleValue)) {
+        setStyle(button, {
+          background: "#00ffff",
+        });
+      } else {
+        setStyle(button, {
+          background: "#efefef",
+        });
+      }
+    });
+  }
   private menuButtonRender(line: string) {
     const button = document.createElement("button");
     button.textContent = "A";
