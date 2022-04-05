@@ -108,7 +108,6 @@ export default class ImageResizer {
   };
 
   mouseUpEventListener = (event: MouseEvent) => {
-    event.preventDefault();
     this.startPosition = undefined;
     this.currentXPoint = undefined;
   };

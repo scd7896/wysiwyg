@@ -1,7 +1,20 @@
-import { findSpanStyleRemove, hasContains, setStyle, setStyleFullText, setRangeContainerStyle } from "../utils/dom";
+import {
+  findSpanStyleRemove,
+  hasContains,
+  setStyle,
+  setStyleFullText,
+  setRangeContainerStyle,
+  getParentStyleValues,
+} from "../utils/dom";
 import { BaseStore } from "./BaseStore";
 
-class RangeSingleton extends BaseStore<{}> {
+class RangeSingletonState {
+  textDecorationValues: string[];
+  constructor() {
+    this.textDecorationValues = [];
+  }
+}
+class RangeSingleton extends BaseStore<RangeSingletonState> {
   selection: Selection;
   type: string;
   range: Range;
@@ -20,7 +33,7 @@ class RangeSingleton extends BaseStore<{}> {
   private static instance: RangeSingleton;
 
   private constructor(parent?: HTMLElement) {
-    super({});
+    super(new RangeSingletonState());
     this.parent = parent;
     this.rangeNodes = [];
 
@@ -30,8 +43,16 @@ class RangeSingleton extends BaseStore<{}> {
       this.range = this.selection.getRangeAt(0);
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
+
       if (this.selection.type === "Range") {
         this.setRangeNode();
+      }
+
+      if (this.anchorNode === this.focusNode) {
+        const values = getParentStyleValues(this.anchorNode, "text-decoration-line");
+        this.setState({
+          textDecorationValues: values,
+        });
       }
 
       this.setState({});
@@ -176,13 +197,9 @@ class RangeSingleton extends BaseStore<{}> {
           changeNodesForFirstOrLast(childNode, index);
         });
       } else {
-        const span = document.createElement("span");
-        setStyle(span, styles);
-        node.childNodes.forEach((child) => span.appendChild(child));
-        node.innerHTML = "";
-        node.appendChild(span);
+        setStyle(node, styles);
         const spanChilds: HTMLSpanElement[] = [];
-        span.childNodes.forEach((child) => {
+        node.childNodes.forEach((child) => {
           if (child.nodeName === "SPAN") spanChilds.push(child as HTMLSpanElement);
         });
         spanChilds.map((span) => findSpanStyleRemove(span, styles));
