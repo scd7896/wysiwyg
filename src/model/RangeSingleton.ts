@@ -60,7 +60,7 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     return this.instance;
   }
 
-  listInsert() {
+  insertUList() {
     const ul = document.createElement("ul");
     const li = document.createElement("li");
     li.textContent = " ";
