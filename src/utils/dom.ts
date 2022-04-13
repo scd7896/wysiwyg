@@ -70,81 +70,14 @@ const splitTextStyle = (node: Node, offset: number, applyStyleIndex: 0 | 1, styl
     fragment.appendChild(textNode);
   }
 
-  return fragment;
+  return [fragment, span];
 };
 
 export const setRangeContainerStyle = (range: Range, node: Node, styles: Record<string, string>, isStart: boolean) => {
   const offset = isStart ? range.startOffset : range.endOffset;
-  let flag = false;
-
-  const nodeDFS = (currentNode: Node) => {
-    if (range.startContainer === currentNode || range.endContainer === currentNode) {
-      if (currentNode.nodeName === "#text") {
-        const fragment = splitTextStyle(currentNode, offset, isStart ? 1 : 0, styles);
-        currentNode.parentElement.replaceChild(fragment, currentNode);
-      } else {
-        setStyle(currentNode as HTMLElement, styles);
-        currentNode.childNodes.forEach((child) => {
-          if (child.nodeName !== "#text") {
-            findSpanStyleRemove(child as HTMLSpanElement, styles);
-          }
-        });
-      }
-      flag = !flag;
-      return;
-    }
-    const childNodes: Node[] = [];
-    currentNode.childNodes.forEach((child) => childNodes.push(child));
-    if (flag) {
-      if (currentNode.nodeName === "#text") {
-        const fragment = splitTextStyle(currentNode, offset, 0, styles);
-        currentNode.parentElement.replaceChild(fragment, currentNode);
-      } else {
-        setStyle(currentNode as HTMLElement, styles);
-        currentNode.childNodes.forEach((child) => {
-          if (child.nodeName !== "#text") {
-            findSpanStyleRemove(child as HTMLSpanElement, styles);
-          }
-        });
-      }
-    }
-
-    const startIndex = isStart ? 0 : childNodes.length - 1;
-    const isLast = (index: number) => {
-      return isStart ? index < childNodes.length : index >= 0;
-    };
-
-    for (let i = startIndex; ; ) {
-      if (isLast(i)) {
-        const child = childNodes[i];
-        nodeDFS(child);
-        if (isStart) {
-          i += 1;
-        } else {
-          i -= 1;
-        }
-      } else {
-        break;
-      }
-    }
-  };
-
-  nodeDFS(node);
-};
-
-export const setStyleEndContainer = (range: Range, node: Node, styles: Record<string, string>) => {
-  const contains = range.endContainer;
-  if (contains.nodeName === "#text") {
-    const fragment = splitTextStyle(node, range.startOffset, 1, styles);
-    contains.parentElement.replaceChild(fragment, contains);
-  } else {
-    setStyle(contains as HTMLElement, styles);
-    contains.childNodes.forEach((child) => {
-      if (child.nodeName !== "#text") {
-        findSpanStyleRemove(child as HTMLSpanElement, styles);
-      }
-    });
-  }
+  const [fragment, span] = splitTextStyle(node, offset, isStart ? 1 : 0, styles);
+  node.parentElement.replaceChild(fragment, node);
+  return span;
 };
 
 export const setStyle = (node: HTMLElement, style: Record<string, string>) => {
