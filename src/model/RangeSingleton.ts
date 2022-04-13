@@ -30,6 +30,8 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
   tmpFocusNode: Node;
   tmpAnchorNode: Node;
 
+  nextRange: Range;
+
   private static instance: RangeSingleton;
 
   private constructor(parent?: HTMLElement) {
@@ -43,6 +45,9 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.range = this.selection.getRangeAt(0);
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
+      if (this.type === "Range") {
+        this.setRangeNode();
+      }
 
       if (this.anchorNode === this.focusNode) {
         const values = getParentStyleValues(this.anchorNode, "text-decoration-line");
@@ -73,7 +78,11 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
 
     if (this.type === "Range") {
       this.setRangeNode();
+      this.nextRange = document.createRange();
       this.rangeEventListener(styles);
+      const newSelection = window.getSelection();
+      newSelection.removeAllRanges();
+      newSelection.addRange(this.nextRange);
     }
     if (this.type === "Caret") {
       this.caretEventListener(styles);
@@ -158,29 +167,20 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
   }
 
   private rangeEventListener(styles: Record<string, string>) {
-    const elementNodeStyleChange = (node: HTMLDivElement) => {
-      if (node === this.range.startContainer) {
-        setRangeContainerStyle(this.range, node, styles, true);
-        return;
-      }
-      if (node === this.range.endContainer) {
-        setRangeContainerStyle(this.range, node, styles, false);
-        return;
-      }
-      if (node.nodeName === "#text") {
-        setStyleFullText(node, styles);
-      } else {
-        setStyle(node as HTMLSpanElement, styles);
-        node.childNodes.forEach((child) => {
-          if (child.nodeName !== "#text") {
-            findSpanStyleRemove(child as HTMLSpanElement, styles);
-          }
-        });
-      }
-    };
     if (this.anchorNode !== this.focusNode) {
-      this.rangeNodes.map((node) => {
-        elementNodeStyleChange(node as HTMLDivElement);
+      this.rangeNodes.map((node, index, array) => {
+        if (index === 0 || index === array.length - 1) {
+          const spanNode = setRangeContainerStyle(this.range, node, styles, index === 0);
+          if (index === 0) this.nextRange.setStart(spanNode, 0);
+          else this.nextRange.setEnd(spanNode, 1);
+        } else {
+          setStyle(node as HTMLSpanElement, styles);
+          node.childNodes.forEach((child) => {
+            if (child.nodeName !== "#text") {
+              findSpanStyleRemove(child as HTMLSpanElement, styles);
+            }
+          });
+        }
       });
     } else {
       this.oneTextNodeStyleChange(styles);
