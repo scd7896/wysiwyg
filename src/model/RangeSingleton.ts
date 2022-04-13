@@ -30,6 +30,8 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
   tmpFocusNode: Node;
   tmpAnchorNode: Node;
 
+  nextRange: Range;
+
   private static instance: RangeSingleton;
 
   private constructor(parent?: HTMLElement) {
@@ -43,8 +45,7 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.range = this.selection.getRangeAt(0);
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
-
-      if (this.selection.type === "Range") {
+      if (this.type === "Range") {
         this.setRangeNode();
       }
 
@@ -54,7 +55,6 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
           textDecorationValues: values,
         });
       }
-
       this.setState({});
     });
   }
@@ -65,14 +65,24 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     return this.instance;
   }
 
+  insertUList() {
+    const ul = document.createElement("ul");
+    const li = document.createElement("li");
+    li.textContent = " ";
+    ul.appendChild(li);
+    this.insertNodeAndFoucs(ul);
+  }
+
   fontSet(styles: Record<string, string>) {
     this.loadTmp();
-    if (this.tmpFocusType === "Range") {
-      this.setRangeNode();
-    }
 
     if (this.type === "Range") {
+      this.setRangeNode();
+      this.nextRange = document.createRange();
       this.rangeEventListener(styles);
+      const newSelection = window.getSelection();
+      newSelection.removeAllRanges();
+      newSelection.addRange(this.nextRange);
     }
     if (this.type === "Caret") {
       this.caretEventListener(styles);
@@ -157,24 +167,12 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
   }
 
   private rangeEventListener(styles: Record<string, string>) {
-    let flag = false;
-
-    const changeNodesForFirstOrLast = (node: Node, index: number) => {
-      if (hasContains(node, this.range.startContainer)) {
-        flag = true;
-        setRangeContainerStyle(this.range, node, styles, true);
-        return;
-      }
-
-      if (hasContains(node, this.range.endContainer)) {
-        setRangeContainerStyle(this.range, node, styles, false);
-        flag = false;
-        return;
-      }
-
-      if (flag) {
-        if (node.nodeName === "#text") {
-          setStyleFullText(node, styles);
+    if (this.anchorNode !== this.focusNode) {
+      this.rangeNodes.map((node, index, array) => {
+        if (index === 0 || index === array.length - 1) {
+          const spanNode = setRangeContainerStyle(this.range, node, styles, index === 0);
+          if (index === 0) this.nextRange.setStart(spanNode, 0);
+          else this.nextRange.setEnd(spanNode, 1);
         } else {
           setStyle(node as HTMLSpanElement, styles);
           node.childNodes.forEach((child) => {
@@ -183,31 +181,6 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
             }
           });
         }
-      }
-    };
-
-    const elementNodeStyleChange = (node: HTMLDivElement, index: number) => {
-      if (index === 0 || index === this.rangeNodes.length - 1) {
-        const childNodes: Node[] = [];
-        node.childNodes.forEach((child) => {
-          childNodes.push(child);
-        });
-
-        childNodes.map((childNode, index) => {
-          changeNodesForFirstOrLast(childNode, index);
-        });
-      } else {
-        setStyle(node, styles);
-        const spanChilds: HTMLSpanElement[] = [];
-        node.childNodes.forEach((child) => {
-          if (child.nodeName === "SPAN") spanChilds.push(child as HTMLSpanElement);
-        });
-        spanChilds.map((span) => findSpanStyleRemove(span, styles));
-      }
-    };
-    if (this.anchorNode !== this.focusNode) {
-      this.rangeNodes.map((node, index) => {
-        elementNodeStyleChange(node as HTMLDivElement, index);
       });
     } else {
       this.oneTextNodeStyleChange(styles);
@@ -219,21 +192,22 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     const board = this.parent.querySelector(".board");
     this.rangeNodes = [];
 
-    board.childNodes.forEach((child) => {
-      if (flag) {
-        this.rangeNodes.push(child);
-      }
-
-      if (hasContains(child, this.selection.anchorNode)) {
-        if (!flag) this.rangeNodes.push(child);
+    const nodeDFS = (node: Node) => {
+      if (this.range.startContainer === node || this.range.endContainer === node) {
+        this.rangeNodes.push(node);
         flag = !flag;
+        return;
+      } else if (hasContains(node, this.range.endContainer)) {
+        node.childNodes.forEach((child) => nodeDFS(child));
+      } else if (flag) {
+        this.rangeNodes.push(node);
+        return;
+      } else {
+        node.childNodes.forEach((child) => nodeDFS(child));
       }
+    };
 
-      if (hasContains(child, this.selection.focusNode)) {
-        if (!flag) this.rangeNodes.push(child);
-        flag = !flag;
-      }
-    });
+    nodeDFS(board);
   }
 }
 
