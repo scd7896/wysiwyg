@@ -92,12 +92,9 @@ export default class ImageResizer {
     if (targetImage) {
       let calculatePercent = 0;
       if (this.startPosition === "left") {
-        const nextDiff = this.calculateNextPercent(this.currentXPoint - event.x);
-        calculatePercent = nextDiff;
+        calculatePercent = this.calculateNextPercent(this.currentXPoint - event.x);
       } else {
-        const nextDiff = this.calculateNextPercent(event.x - this.currentXPoint);
-
-        calculatePercent = nextDiff;
+        calculatePercent = this.calculateNextPercent(event.x - this.currentXPoint);
       }
 
       if (calculatePercent > this.board.clientWidth - 24) calculatePercent = this.board.clientWidth - 24;
