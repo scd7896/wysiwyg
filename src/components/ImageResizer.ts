@@ -5,8 +5,10 @@ export default class ImageResizer {
   private wrapper: HTMLDivElement;
   private startPosition: "left" | "right";
   private currentXPoint: number;
+  private board: HTMLDivElement;
 
   constructor(parent: Element) {
+    this.board = parent.querySelector(".board");
     this.wrapper = document.createElement("div");
     [
       { top: "0%", left: "0%" },
@@ -33,7 +35,7 @@ export default class ImageResizer {
     this.render();
     ImageResizerStore.subscribe(this);
     this.wrapper.addEventListener("mousedown", this.mouseDownEventListener);
-    this.wrapper.addEventListener("mousemove", this.mouseMoveEventListener);
+    parent.addEventListener("mousemove", this.mouseMoveEventListener);
     parent.addEventListener("mouseup", this.mouseUpEventListener);
     parent.addEventListener("mouseleave", this.mouseUpEventListener);
   }
@@ -68,6 +70,7 @@ export default class ImageResizer {
 
   mouseDownEventListener = (event: MouseEvent) => {
     event.preventDefault();
+
     const pointElement = findElementByType(event.target as HTMLElement, "point");
     const targetImage = ImageResizerStore.state.selectedImage;
     if (!pointElement || !targetImage) return;
@@ -87,25 +90,30 @@ export default class ImageResizer {
     const targetImage = ImageResizerStore.state.selectedImage;
     if (!this.startPosition) return;
     if (targetImage) {
-      const width = targetImage.style.getPropertyValue("width");
-      const [percentText] = width.split("%");
-      const percentNumber = Number(percentText);
       let calculatePercent = 0;
       if (this.startPosition === "left") {
-        const nextDiff = this.currentXPoint - event.x > 0 ? 0.1 : 0.1 * -1;
-        calculatePercent = percentNumber + nextDiff;
+        const nextDiff = this.calculateNextPercent(this.currentXPoint - event.x);
+        calculatePercent = nextDiff;
       } else {
-        const nextDiff = event.x - this.currentXPoint > 0 ? 0.1 : 0.1 * -1;
-        calculatePercent = percentNumber + nextDiff;
+        const nextDiff = this.calculateNextPercent(event.x - this.currentXPoint);
+
+        calculatePercent = nextDiff;
       }
 
-      if (calculatePercent > 100) calculatePercent = 100;
-      if (calculatePercent < 4) calculatePercent = 4;
-      targetImage.style.setProperty("width", `${calculatePercent}%`);
+      if (calculatePercent > this.board.clientWidth - 24) calculatePercent = this.board.clientWidth - 24;
+
+      targetImage.style.setProperty("width", `${calculatePercent}px`);
       this.update();
     }
     this.currentXPoint = event.x;
   };
+
+  calculateNextPercent(diffPx: number) {
+    const targetImage = ImageResizerStore.state.selectedImage;
+    const targetImageWidth = targetImage.width + diffPx;
+
+    return targetImageWidth;
+  }
 
   mouseUpEventListener = (event: MouseEvent) => {
     this.startPosition = undefined;
