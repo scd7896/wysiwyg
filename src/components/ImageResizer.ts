@@ -69,8 +69,6 @@ export default class ImageResizer {
   }
 
   mouseDownEventListener = (event: MouseEvent) => {
-    event.preventDefault();
-
     const pointElement = findElementByType(event.target as HTMLElement, "point");
     const targetImage = ImageResizerStore.state.selectedImage;
     if (!pointElement || !targetImage) return;
@@ -86,7 +84,6 @@ export default class ImageResizer {
   };
 
   mouseMoveEventListener = (event: MouseEvent) => {
-    event.preventDefault();
     const targetImage = ImageResizerStore.state.selectedImage;
     if (!this.startPosition) return;
     if (targetImage) {
