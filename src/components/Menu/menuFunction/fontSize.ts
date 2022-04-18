@@ -66,7 +66,7 @@ export default class FontSize implements IComponent {
     setStyle(this.button, { border: "1px solid #aaa", padding: "8px 14px", "background-color": "white" });
 
     this.button.addEventListener("click", () => {
-      RangeSingleton.getInstance().fontSet({
+      RangeSingleton.getInstance().setStyle({
         "font-size": `${FontSizeStore.state.fontSize}px`,
       });
     });
@@ -112,7 +112,7 @@ export default class FontSize implements IComponent {
       "submit",
       onSubmit(({ inputValue }) => {
         if (!isNaN(Number(input.value))) {
-          FontSizeStore.setFontSize(inputValue);
+          FontSizeStore.setStyleSize(inputValue);
         }
         FontSizeStore.closeInput();
       }),

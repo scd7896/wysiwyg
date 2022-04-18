@@ -26,7 +26,7 @@ class FontSizeStore extends BaseStore<FontSizeState> {
     });
   }
 
-  setFontSize(fontSize: number) {
+  setStyleSize(fontSize: number) {
     this.setState({
       fontSize,
     });

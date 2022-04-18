@@ -102,3 +102,14 @@ export const findImageByParentNode = (target: HTMLElement) => {
   }
   return null;
 };
+
+export const findParentByNodeName = (target: HTMLElement, nodeName: string) => {
+  let tmpTarget = target;
+
+  while (tmpTarget) {
+    if (tmpTarget.nodeName === nodeName) return tmpTarget;
+    tmpTarget = tmpTarget.parentElement;
+  }
+
+  return null;
+};

@@ -65,15 +65,7 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     return this.instance;
   }
 
-  insertUList() {
-    const ul = document.createElement("ul");
-    const li = document.createElement("li");
-    li.textContent = " ";
-    ul.appendChild(li);
-    this.insertNodeAndFoucs(ul);
-  }
-
-  fontSet(styles: Record<string, string>) {
+  setStyle(styles: Record<string, string>) {
     this.loadTmp();
 
     if (this.type === "Range") {
@@ -101,7 +93,7 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     this.initializeTmp();
   }
 
-  tmpSave() {
+  saveTmp() {
     this.tmpFocusSelection = this.selection;
     this.tmpFocusRange = this.range;
     this.tmpFocusType = this.type;
@@ -119,16 +111,7 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     this.tmpAnchorNode = undefined;
   }
 
-  private loadTmp() {
-    this.selection = this.tmpFocusSelection || this.selection;
-    this.range = this.tmpFocusRange || this.range;
-    this.type = this.tmpFocusType || this.type;
-    this.rangeNodes = this.tmpRangeNodes || this.rangeNodes;
-    this.focusNode = this.tmpFocusNode || this.focusNode;
-    this.anchorNode = this.tmpAnchorNode || this.anchorNode;
-  }
-
-  private insertNodeAndFoucs(node: HTMLElement) {
+  insertNodeAndFoucs(node: HTMLElement) {
     this.range.insertNode(node);
     this.parent.focus();
     const newRange = document.createRange();
@@ -136,6 +119,15 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     const newSelection = window.getSelection();
     newSelection.removeAllRanges();
     newSelection.addRange(newRange);
+  }
+
+  private loadTmp() {
+    this.selection = this.tmpFocusSelection || this.selection;
+    this.range = this.tmpFocusRange || this.range;
+    this.type = this.tmpFocusType || this.type;
+    this.rangeNodes = this.tmpRangeNodes || this.rangeNodes;
+    this.focusNode = this.tmpFocusNode || this.focusNode;
+    this.anchorNode = this.tmpAnchorNode || this.anchorNode;
   }
 
   private caretEventListener(styles: Record<string, string>) {
