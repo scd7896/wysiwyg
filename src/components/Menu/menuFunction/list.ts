@@ -17,7 +17,9 @@ class List {
     ul.appendChild(li);
     const parentLi = findParentByNodeName(RangeSingleton.getInstance().anchorNode as HTMLElement, "LI");
     if (parentLi) {
+      li.innerHTML = parentLi.innerHTML;
       parentLi.parentElement.replaceChild(ul, parentLi);
+      RangeSingleton.getInstance().changeFocusNode(li);
     } else {
       RangeSingleton.getInstance().insertNodeAndFoucs(ul);
     }
