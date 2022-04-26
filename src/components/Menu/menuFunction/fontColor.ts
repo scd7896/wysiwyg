@@ -55,7 +55,7 @@ export default class FontColor {
       FontColorStore.setColor(e.target.value);
     });
     this.applyButton.addEventListener("click", () => {
-      RangeSingleton.getInstance().fontSet({
+      RangeSingleton.getInstance().setStyle({
         color: FontColorStore.state.color,
       });
     });

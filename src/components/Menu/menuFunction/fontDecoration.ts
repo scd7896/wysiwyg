@@ -32,7 +32,7 @@ export default class FontDecoration {
         if (textDecorationValues?.find((styleValue) => lineStyle === styleValue)) {
           removeStyles(RangeSingleton.getInstance().anchorNode, "text-decoration-line", lineStyle);
         } else {
-          RangeSingleton.getInstance().fontSet({
+          RangeSingleton.getInstance().setStyle({
             "text-decoration-line": lineStyle,
           });
         }

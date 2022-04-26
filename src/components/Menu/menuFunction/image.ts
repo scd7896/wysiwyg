@@ -60,7 +60,7 @@ export default class Image implements IComponent {
       setStyle(this.imageForm, {
         display: "block",
       });
-      RangeSingleton.getInstance().tmpSave();
+      RangeSingleton.getInstance().saveTmp();
       document.addEventListener("click", this.clickOutSide);
     } else {
       setStyle(this.imageForm, {
