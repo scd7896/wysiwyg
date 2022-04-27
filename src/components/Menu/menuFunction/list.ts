@@ -26,11 +26,11 @@ class List {
   tabulList() {
     if (RangeSingleton.getInstance().type === "Range") return;
     const parentLi = findParentByNodeName(RangeSingleton.getInstance().anchorNode as HTMLElement, "LI");
+    const ul = document.createElement("ul");
+    const li = document.createElement("li");
+    li.textContent = " ";
+    ul.appendChild(li);
     if (parentLi) {
-      const ul = document.createElement("ul");
-      const li = document.createElement("li");
-      li.textContent = " ";
-      ul.appendChild(li);
       li.innerHTML = parentLi.innerHTML;
       parentLi.parentElement.replaceChild(ul, parentLi);
       RangeSingleton.getInstance().changeFocusNode(li);
@@ -39,11 +39,11 @@ class List {
 
   insertUList() {
     if (RangeSingleton.getInstance().type === "Range") return;
+    const parentLi = findParentByNodeName(RangeSingleton.getInstance().anchorNode as HTMLElement, "LI");
     const ul = document.createElement("ul");
     const li = document.createElement("li");
     li.textContent = " ";
     ul.appendChild(li);
-    const parentLi = findParentByNodeName(RangeSingleton.getInstance().anchorNode as HTMLElement, "LI");
     if (parentLi) {
       li.innerHTML = parentLi.innerHTML;
       parentLi.parentElement.replaceChild(ul, parentLi);
