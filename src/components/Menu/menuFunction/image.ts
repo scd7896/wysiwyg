@@ -2,6 +2,7 @@ import { onSubmit } from "web-form-helper";
 import { ImageStore, RangeSingleton } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { findElementByType, setStyle } from "../../../utils/dom";
+import SubModal from "../../SubModal/SubModal";
 
 export default class Image implements IComponent {
   private parent: HTMLElement;
@@ -12,6 +13,7 @@ export default class Image implements IComponent {
   private footerNav: HTMLDivElement;
   private formBody: HTMLDivElement;
   private imageOptions?: any;
+  private modal: SubModal;
 
   constructor(parent: HTMLElement, options?: any) {
     this.imageOptions = options?.image;
@@ -42,33 +44,14 @@ export default class Image implements IComponent {
     this.imageForm.appendChild(this.footerNav);
 
     this.wrapper.appendChild(this.toggleButton);
-    this.wrapper.dataset.type = "imageWrapper";
-    this.wrapper.appendChild(this.imageForm);
+    this.modal = new SubModal(this.wrapper, this.imageForm);
 
     this.parent.appendChild(this.wrapper);
     this.render();
     ImageStore.subscribe(this);
   }
 
-  private clickOutSide = (e: any) => {
-    const target = findElementByType(e.target, "imageWrapper");
-    if (!target) ImageStore.closeMenu();
-  };
-
   update() {
-    if (ImageStore.state.isMenuOpen) {
-      setStyle(this.imageForm, {
-        display: "block",
-      });
-      RangeSingleton.getInstance().saveTmp();
-      document.addEventListener("click", this.clickOutSide);
-    } else {
-      setStyle(this.imageForm, {
-        display: "none",
-      });
-      RangeSingleton.getInstance().initializeTmp();
-      document.removeEventListener("click", this.clickOutSide);
-    }
     this.renderHeaderNav();
     this.renderFormBody();
     this.renderFooterNav();
@@ -79,25 +62,13 @@ export default class Image implements IComponent {
       position: "relative",
     });
 
-    setStyle(this.imageForm, {
-      display: "none",
-      position: "absolute",
-      left: "0",
-      top: "100%",
-      padding: "12px",
-      width: "350px",
-      "border-radius": "8px",
-      "box-shadow": "4px 4px 4px rgba(0,0,0,0.5)",
-      "background-color": "#fff",
-    });
-
     this.renderHeaderNav();
     this.renderFormBody();
     this.renderFooterNav();
 
     this.toggleButton.textContent = "image";
     this.toggleButton.addEventListener("click", () => {
-      ImageStore.toggleMenu();
+      this.modal.toggleModal();
     });
 
     this.headerNav.addEventListener("click", (e) => {
@@ -111,7 +82,7 @@ export default class Image implements IComponent {
       "submit",
       onSubmit(({ url }) => {
         this.insertImage(url);
-        ImageStore.closeMenu();
+        this.modal.closeModal();
       }),
     );
   }
@@ -182,7 +153,7 @@ export default class Image implements IComponent {
           url = URL.createObjectURL(e.target.files[0]);
         }
         this.insertImage(url);
-        ImageStore.closeMenu();
+        this.modal.closeModal();
       });
     } else {
       input.type = "text";
@@ -194,6 +165,6 @@ export default class Image implements IComponent {
 
   insertImage = (url: string) => {
     RangeSingleton.getInstance().insertImage(url);
-    ImageStore.closeMenu();
+    this.modal.closeModal();
   };
 }
