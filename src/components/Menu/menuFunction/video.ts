@@ -1,6 +1,8 @@
 import { onSubmit } from "web-form-helper";
+import { RangeSingleton } from "../../../model";
 import VideoStore from "../../../model/VideoStore";
 import { setStyle } from "../../../utils/dom";
+import { getHostName } from "../../../utils/string";
 import SubModal from "../../SubModal/SubModal";
 
 class Video {
@@ -44,17 +46,66 @@ class Video {
 
     this.form.addEventListener(
       "submit",
-      onSubmit((arg) => {}),
+      onSubmit((arg: any) => {
+        switch (VideoStore.state.mode) {
+          case "url":
+            const hostName = getHostName(arg.url);
+            console.log(hostName);
+            if (hostName === "youtu.be") {
+              const contents = arg.url.split("/").pop();
+              this.embeddedYoutube(contents);
+            }
+        }
+      }),
     );
+
+    switch (VideoStore.state.mode) {
+      case "embedCode":
+        break;
+      case "file":
+        break;
+      case "url":
+        this.renderUrlFormContents();
+        break;
+    }
+  }
+
+  private embeddedYoutube(contents: string) {
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://youtube.com/embed/${contents}`;
+    const board = this.parent.parentElement.querySelector(".board");
+
+    setStyle(iframe, {
+      width: `${board.clientWidth - 24}px`,
+      height: `${((board.clientWidth - 24) / 16) * 9}px`,
+      display: "block",
+    });
+    RangeSingleton.getInstance().insertNodeAndFoucs(iframe);
   }
 
   private renderUrlFormContents() {
+    const section = document.createElement("div");
+    setStyle(section, {
+      padding: "8px",
+    });
+    const span = document.createElement("span");
+    span.textContent = "url";
+    const input = document.createElement("input");
+    input.name = "url";
+    setStyle(input, {
+      width: "260px",
+      height: "46px",
+    });
+    section.appendChild(span);
+    section.appendChild(input);
+    this.form.appendChild(section);
     this.renderFooterContents();
   }
 
   private renderFooterContents() {
     const footer = document.createElement("div");
     const submitButton = document.createElement("button");
+    submitButton.textContent = "insert";
     submitButton.type = "submit";
     setStyle(submitButton, {
       background: "none",
@@ -64,6 +115,7 @@ class Video {
       cursor: "pointer",
     });
     footer.appendChild(submitButton);
+
     this.form.appendChild(footer);
   }
 }

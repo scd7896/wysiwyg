@@ -1,6 +1,6 @@
 import { RangeSingleton } from "../../model";
 import SubModalStore from "../../model/SubModalStore";
-import { findElementByType, hasContains, setStyle } from "../../utils/dom";
+import { hasContains, setStyle } from "../../utils/dom";
 
 class SubModal {
   private store: SubModalStore;
