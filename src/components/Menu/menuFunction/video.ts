@@ -71,16 +71,33 @@ class Video {
   }
 
   private embeddedYoutube(contents: string) {
-    const iframe = document.createElement("iframe");
-    iframe.src = `https://youtube.com/embed/${contents}`;
     const board = this.parent.parentElement.querySelector(".board");
-
-    setStyle(iframe, {
+    const wrapper = document.createElement("div");
+    wrapper.dataset.nodeName = "IFRAME";
+    setStyle(wrapper, {
       width: `${board.clientWidth - 24}px`,
       height: `${((board.clientWidth - 24) / 16) * 9}px`,
+      position: "relative",
+    });
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://youtube.com/embed/${contents}`;
+    const clickedDummy = document.createElement("div");
+    setStyle(clickedDummy, {
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      left: "0",
+      top: "0",
+      cursor: "pointer",
+    });
+    setStyle(iframe, {
+      width: `100%`,
+      height: `100%`,
       display: "block",
     });
-    RangeSingleton.getInstance().insertNodeAndFoucs(iframe);
+    wrapper.appendChild(clickedDummy);
+    wrapper.appendChild(iframe);
+    RangeSingleton.getInstance().insertNodeAndFoucs(wrapper);
   }
 
   private renderUrlFormContents() {

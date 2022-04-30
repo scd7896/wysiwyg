@@ -118,7 +118,6 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
 
   insertNodeAndFoucs(node: HTMLElement) {
     const board = this.parent.querySelector(".board");
-    console.log(this.range);
     if (hasContains(board, this.range.startContainer) && hasContains(board, this.range.endContainer)) {
       this.range.insertNode(node);
       this.changeFocusNode(node);
