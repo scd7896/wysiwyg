@@ -1,7 +1,7 @@
 import { onSubmit } from "web-form-helper";
 import { RangeSingleton } from "../../../model";
-import VideoStore from "../../../model/VideoStore";
-import { setStyle } from "../../../utils/dom";
+import VideoStore, { TVideoInsertMode } from "../../../model/VideoStore";
+import { findElementByType, setStyle } from "../../../utils/dom";
 import { getHostName, queryParse } from "../../../utils/string";
 import SubModal from "../../SubModal/SubModal";
 
@@ -11,8 +11,10 @@ class Video {
   private modal: SubModal;
   private button: HTMLButtonElement;
   private form: HTMLFormElement;
+  private options: any;
 
   constructor(parent: HTMLElement, options?: any) {
+    this.options = options;
     this.wrapper = document.createElement("div");
     this.parent = parent;
     this.form = document.createElement("form");
@@ -25,16 +27,7 @@ class Video {
   }
 
   update() {
-    this.form.innerHTML = "";
-    switch (VideoStore.state.mode) {
-      case "embedCode":
-        break;
-      case "file":
-        break;
-      case "url":
-        this.renderUrlFormContents();
-        break;
-    }
+    this.formContentsRender();
   }
 
   render() {
@@ -46,7 +39,7 @@ class Video {
 
     this.form.addEventListener(
       "submit",
-      onSubmit((arg: any) => {
+      onSubmit(async (arg: any) => {
         switch (VideoStore.state.mode) {
           case "url":
             const hostName = getHostName(arg.url);
@@ -58,19 +51,57 @@ class Video {
               const contents = queryParse(arg.url).v;
               this.embeddedYoutube(contents);
             }
+          case "file":
+            let url = "";
+            if (this.options?.video?.onUpload) {
+              url = await this.options?.video?.onUpload(arg.file);
+            } else {
+              url = URL.createObjectURL(arg.file);
+            }
+            this.embeddedVideo(url);
         }
       }),
     );
+    this.formContentsRender();
+  }
 
+  private formContentsRender() {
+    this.form.innerHTML = "";
+    this.renderHeaderContents();
     switch (VideoStore.state.mode) {
       case "embedCode":
         break;
       case "file":
+        this.renderFileFormContents();
         break;
       case "url":
         this.renderUrlFormContents();
         break;
     }
+    this.renderFooterContents();
+  }
+  private embeddedVideo(url: string) {
+    const board = this.parent.parentElement.querySelector(".board");
+    const wrapper = document.createElement("div");
+    wrapper.dataset.nodeName = "IFRAME";
+    setStyle(wrapper, {
+      width: `${board.clientWidth - 24}px`,
+      height: `${((board.clientWidth - 24) / 16) * 9}px`,
+      position: "relative",
+    });
+    const video = document.createElement("video");
+    video.src = url;
+    video.controls = true;
+    const clickedDummy = document.createElement("div");
+    setStyle(video, {
+      width: `100%`,
+      height: `100%`,
+      display: "block",
+    });
+    wrapper.appendChild(clickedDummy);
+    wrapper.appendChild(video);
+    RangeSingleton.getInstance().insertNodeAndFoucs(wrapper);
+    this.modal.closeModal();
   }
 
   private embeddedYoutube(contents: string) {
@@ -104,6 +135,25 @@ class Video {
     this.modal.closeModal();
   }
 
+  private renderFileFormContents() {
+    const section = document.createElement("div");
+    setStyle(section, {
+      padding: "8px",
+    });
+    const span = document.createElement("span");
+    span.textContent = "file";
+    const input = document.createElement("input");
+    input.name = "file";
+    input.type = "file";
+    setStyle(input, {
+      width: "260px",
+      height: "46px",
+    });
+    section.appendChild(span);
+    section.appendChild(input);
+    this.form.appendChild(section);
+  }
+
   private renderUrlFormContents() {
     const section = document.createElement("div");
     setStyle(section, {
@@ -120,7 +170,26 @@ class Video {
     section.appendChild(span);
     section.appendChild(input);
     this.form.appendChild(section);
-    this.renderFooterContents();
+  }
+
+  private renderHeaderContents() {
+    const header = document.createElement("div");
+    const buttons = ["url", "file"].map((type) => {
+      const button = document.createElement("button");
+      button.textContent = type;
+      button.dataset.type = "type";
+      button.dataset.value = type;
+      return button;
+    });
+    buttons.map((button) => header.appendChild(button));
+    header.addEventListener("click", (e: any) => {
+      const target = findElementByType(e.target, "type");
+      if (target) {
+        const type = target.dataset.value;
+        VideoStore.setMode(type as TVideoInsertMode);
+      }
+    });
+    this.form.appendChild(header);
   }
 
   private renderFooterContents() {

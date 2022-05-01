@@ -1,6 +1,6 @@
 import { BaseStore } from "./BaseStore";
 
-type TVideoInsertMode = "file" | "url" | "embedCode";
+export type TVideoInsertMode = "file" | "url" | "embedCode";
 
 class VideoState {
   mode: TVideoInsertMode;
