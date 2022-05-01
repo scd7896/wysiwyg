@@ -41,7 +41,7 @@ export const findSpanStyleRemove = (span: HTMLSpanElement, styles: Record<string
     if (child.nodeName === "SPAN") findSpanStyleRemove(child as HTMLSpanElement, styles);
   });
 
-  if (span.style.length === 0) {
+  if (span.nodeName === "SPAN" && span.style.length === 0) {
     const text = document.createTextNode(span.textContent);
     span.parentElement.replaceChild(text, span);
   }
