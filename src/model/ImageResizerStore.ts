@@ -1,9 +1,9 @@
 import { BaseStore } from "./BaseStore";
 
 class ImageResizeState {
-  selectedImage?: HTMLImageElement;
+  selectedNode?: HTMLElement;
   constructor() {
-    this.selectedImage = undefined;
+    this.selectedNode = undefined;
   }
 }
 
@@ -12,15 +12,15 @@ class ImageResizerStore extends BaseStore<ImageResizeState> {
     super(new ImageResizeState());
   }
 
-  setSelectedImage(image: HTMLImageElement) {
+  setSelectedNode(node: HTMLElement) {
     this.setState({
-      selectedImage: image,
+      selectedNode: node,
     });
   }
 
   setInitlization() {
     this.setState({
-      selectedImage: undefined,
+      selectedNode: undefined,
     });
   }
 }
