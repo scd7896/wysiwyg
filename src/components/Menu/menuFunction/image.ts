@@ -1,4 +1,3 @@
-import { onSubmit } from "web-form-helper";
 import { ImageStore, RangeSingleton } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { findElementByType, setStyle } from "../../../utils/dom";
@@ -8,10 +7,11 @@ export default class Image implements IComponent {
   private parent: HTMLElement;
   private wrapper: HTMLDivElement;
   private toggleButton: HTMLButtonElement;
-  private imageForm: HTMLFormElement;
+  private imageForm: HTMLDivElement;
   private headerNav: HTMLDivElement;
   private footerNav: HTMLDivElement;
   private formBody: HTMLDivElement;
+  private urlInput: HTMLInputElement;
   private imageOptions?: any;
   private modal: SubModal;
 
@@ -20,7 +20,7 @@ export default class Image implements IComponent {
     this.parent = parent;
     this.wrapper = document.createElement("div");
     this.toggleButton = document.createElement("button");
-    this.imageForm = document.createElement("form");
+    this.imageForm = document.createElement("div");
     this.headerNav = document.createElement("div");
     ["file", "url"].map((type) => {
       const button = document.createElement("button");
@@ -38,7 +38,6 @@ export default class Image implements IComponent {
     submitButton.textContent = "insert";
     submitButton.type = "submit";
     this.footerNav.appendChild(submitButton);
-
     this.imageForm.appendChild(this.headerNav);
     this.imageForm.appendChild(this.formBody);
     this.imageForm.appendChild(this.footerNav);
@@ -77,14 +76,6 @@ export default class Image implements IComponent {
         ImageStore.setMode(target.dataset.value as any);
       }
     });
-
-    this.imageForm.addEventListener(
-      "submit",
-      onSubmit(({ url }) => {
-        this.insertImage(url);
-        this.modal.closeModal();
-      }),
-    );
   }
 
   renderHeaderNav() {
@@ -118,6 +109,10 @@ export default class Image implements IComponent {
       "justify-content": "flex-end",
     });
     const submitButton = this.footerNav.childNodes.item(0) as HTMLButtonElement;
+    submitButton.addEventListener("click", () => {
+      this.urlInput?.value && this.insertImage(this.urlInput.value);
+      this.modal.closeModal();
+    });
 
     setStyle(submitButton, {
       background: "none",
@@ -145,6 +140,7 @@ export default class Image implements IComponent {
     if (ImageStore.state.mode === "file") {
       input.type = "file";
       input.name = "file";
+      this.urlInput = undefined;
       input.addEventListener("change", async (e: any) => {
         let url = "";
         if (this.imageOptions?.onUploadSingle) {
@@ -156,6 +152,7 @@ export default class Image implements IComponent {
         this.modal.closeModal();
       });
     } else {
+      this.urlInput = input;
       input.type = "text";
       input.name = "url";
     }

@@ -50,9 +50,6 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.type = this.selection.type;
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
-      if (this.type === "Range") {
-        this.setRangeNode();
-      }
 
       if (this.anchorNode === this.focusNode) {
         const values = getParentStyleValues(this.anchorNode, "text-decoration-line");

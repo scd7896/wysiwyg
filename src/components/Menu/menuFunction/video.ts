@@ -10,14 +10,16 @@ class Video {
   private parent: HTMLElement;
   private modal: SubModal;
   private button: HTMLButtonElement;
-  private form: HTMLFormElement;
+  private form: HTMLDivElement;
+
+  private input: HTMLInputElement;
   private options: any;
 
   constructor(parent: HTMLElement, options?: any) {
     this.options = options;
     this.wrapper = document.createElement("div");
     this.parent = parent;
-    this.form = document.createElement("form");
+    this.form = document.createElement("div");
     this.modal = new SubModal(this.wrapper, this.form);
     this.button = document.createElement("button");
     this.wrapper.appendChild(this.button);
@@ -36,32 +38,6 @@ class Video {
     this.button.addEventListener("click", () => {
       this.modal.toggleModal();
     });
-
-    this.form.addEventListener(
-      "submit",
-      onSubmit(async (arg: any) => {
-        switch (VideoStore.state.mode) {
-          case "url":
-            const hostName = getHostName(arg.url);
-            if (hostName === "youtu.be") {
-              const contents = arg.url.split("/").pop();
-              this.embeddedYoutube(contents);
-            }
-            if (hostName === "www.youtube.com") {
-              const contents = queryParse(arg.url).v;
-              this.embeddedYoutube(contents);
-            }
-          case "file":
-            let url = "";
-            if (this.options?.video?.onUpload) {
-              url = await this.options?.video?.onUpload(arg.file);
-            } else {
-              url = URL.createObjectURL(arg.file);
-            }
-            this.embeddedVideo(url);
-        }
-      }),
-    );
     this.formContentsRender();
   }
 
@@ -150,6 +126,7 @@ class Video {
     });
     section.appendChild(span);
     section.appendChild(input);
+    this.input = input;
     this.form.appendChild(section);
   }
 
@@ -168,6 +145,7 @@ class Video {
     });
     section.appendChild(span);
     section.appendChild(input);
+    this.input = input;
     this.form.appendChild(section);
   }
 
@@ -204,6 +182,28 @@ class Video {
       cursor: "pointer",
     });
     footer.appendChild(submitButton);
+    submitButton.addEventListener("click", async () => {
+      switch (VideoStore.state.mode) {
+        case "url":
+          const hostName = getHostName(this.input.value);
+          if (hostName === "youtu.be") {
+            const contents = this.input.value.split("/").pop();
+            this.embeddedYoutube(contents);
+          }
+          if (hostName === "www.youtube.com") {
+            const contents = queryParse(this.input.value).v;
+            this.embeddedYoutube(contents);
+          }
+        case "file":
+          let url = "";
+          if (this.options?.video?.onUpload) {
+            url = await this.options?.video?.onUpload(this.input.files[0]);
+          } else {
+            url = URL.createObjectURL(this.input.files[0]);
+          }
+          this.embeddedVideo(url);
+      }
+    });
 
     this.form.appendChild(footer);
   }
