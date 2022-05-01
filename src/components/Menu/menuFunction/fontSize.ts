@@ -1,13 +1,12 @@
 import { RangeSingleton, FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { setStyle } from "../../../utils/dom";
-import { onSubmit } from "web-form-helper";
 import SubModal from "../../SubModal/SubModal";
 
 export default class FontSize implements IComponent {
   private parent: HTMLElement;
   private wrapper: HTMLDivElement;
-  private inputWrapper: HTMLFormElement;
+  private inputWrapper: HTMLDivElement;
   private button: HTMLButtonElement;
   private menuOpenButton: HTMLButtonElement;
   private modal: SubModal;
@@ -33,7 +32,7 @@ export default class FontSize implements IComponent {
     this.wrapper = wrapper;
     this.button = button;
     this.menuOpenButton = menuOpenButton;
-    this.inputWrapper = document.createElement("form");
+    this.inputWrapper = document.createElement("div");
     this.modal = new SubModal(this.wrapper, this.inputWrapper);
     this.fontSizeInputSetting();
     this.wrapperSetting();
@@ -79,15 +78,12 @@ export default class FontSize implements IComponent {
     input.defaultValue = FontSizeStore.state.fontSize.toString();
     const button = document.createElement("button");
     button.type = "submit";
-    this.inputWrapper.addEventListener(
-      "submit",
-      onSubmit(({ inputValue }) => {
-        if (!isNaN(Number(input.value))) {
-          FontSizeStore.setStyleSize(inputValue);
-        }
-        this.modal.closeModal();
-      }),
-    );
+    button.addEventListener("click", () => {
+      if (!isNaN(Number(input.value))) {
+        FontSizeStore.setStyleSize(Number(input.value));
+      }
+      this.modal.closeModal();
+    });
     button.textContent = "submit";
     this.inputWrapper.appendChild(input);
     this.inputWrapper.appendChild(button);
