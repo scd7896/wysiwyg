@@ -16,6 +16,7 @@ const menuClass = css`
   left: 0;
   background: white;
   border-bottom: 1px solid black;
+  z-index: 999;
 `;
 export default class Menu implements IComponent {
   private parent: Element;

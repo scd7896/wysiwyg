@@ -40,9 +40,14 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     this.rangeNodes = [];
 
     document.addEventListener("selectionchange", (e) => {
-      this.selection = document.getSelection();
+      const board = this.parent.querySelector(".board");
+      const selection = document.getSelection();
+      const range = selection.getRangeAt(0);
+      if (!hasContains(board, range.startContainer) || !hasContains(board, range.endContainer)) return;
+
+      this.selection = selection;
+      this.range = range;
       this.type = this.selection.type;
-      this.range = this.selection.getRangeAt(0);
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
       if (this.type === "Range") {
@@ -112,8 +117,11 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
   }
 
   insertNodeAndFoucs(node: HTMLElement) {
-    this.range.insertNode(node);
-    this.changeFocusNode(node);
+    const board = this.parent.querySelector(".board");
+    if (hasContains(board, this.range.startContainer) && hasContains(board, this.range.endContainer)) {
+      this.range.insertNode(node);
+      this.changeFocusNode(node);
+    }
   }
 
   changeFocusNode(node: Node) {

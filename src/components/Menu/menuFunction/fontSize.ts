@@ -1,7 +1,8 @@
 import { RangeSingleton, FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
-import { hasContains, setStyle } from "../../../utils/dom";
+import { setStyle } from "../../../utils/dom";
 import { onSubmit } from "web-form-helper";
+import SubModal from "../../SubModal/SubModal";
 
 export default class FontSize implements IComponent {
   private parent: HTMLElement;
@@ -9,6 +10,7 @@ export default class FontSize implements IComponent {
   private inputWrapper: HTMLFormElement;
   private button: HTMLButtonElement;
   private menuOpenButton: HTMLButtonElement;
+  private modal: SubModal;
 
   constructor(parent: HTMLElement) {
     this.parent = parent;
@@ -18,20 +20,12 @@ export default class FontSize implements IComponent {
 
   update() {
     this.button.textContent = `${FontSizeStore.state.fontSize}px`;
-    if (FontSizeStore.state.isInputOpen) {
-      this.inputWrapper.style.setProperty("display", "block");
-      window.addEventListener("click", this.inputWrapperClickListener);
-    } else {
-      this.inputWrapper.style.setProperty("display", "none");
-      window.removeEventListener("click", this.inputWrapperClickListener);
-    }
   }
 
   render() {
     const wrapper = document.createElement("div");
     const button = document.createElement("button");
     const menuOpenButton = document.createElement("button");
-    const inputWrapper = document.createElement("form");
 
     button.textContent = `${FontSizeStore.state.fontSize}px`;
     menuOpenButton.textContent = "setting";
@@ -39,8 +33,8 @@ export default class FontSize implements IComponent {
     this.wrapper = wrapper;
     this.button = button;
     this.menuOpenButton = menuOpenButton;
-    this.inputWrapper = inputWrapper;
-
+    this.inputWrapper = document.createElement("form");
+    this.modal = new SubModal(this.wrapper, this.inputWrapper);
     this.fontSizeInputSetting();
     this.wrapperSetting();
     this.buttonSetting();
@@ -48,15 +42,8 @@ export default class FontSize implements IComponent {
 
     wrapper.appendChild(button);
     wrapper.appendChild(menuOpenButton);
-    wrapper.appendChild(inputWrapper);
     this.parent.appendChild(wrapper);
   }
-
-  private inputWrapperClickListener = (event: any) => {
-    if (FontSizeStore.state.isInputOpen && !hasContains(this.inputWrapper, event.target as HTMLElement)) {
-      FontSizeStore.closeInput();
-    }
-  };
 
   private wrapperSetting() {
     this.wrapper.style.setProperty("position", "relative");
@@ -81,27 +68,11 @@ export default class FontSize implements IComponent {
     });
 
     this.menuOpenButton.addEventListener("click", () => {
-      if (FontSizeStore.state.isInputOpen) {
-        FontSizeStore.closeInput();
-      } else {
-        FontSizeStore.openInput();
-      }
+      this.modal.toggleModal();
     });
   }
 
   private fontSizeInputSetting() {
-    setStyle(this.inputWrapper, {
-      position: "absolute",
-      height: "48px",
-      top: "100%",
-      left: "0",
-      display: "none",
-      background: "white",
-      padding: "8px",
-      "box-shadow": "4px 4px 4px rgba(0,0,0,0.8)",
-      "border-radius": "4px",
-    });
-
     const input = document.createElement("input");
     input.type = "number";
     input.name = "inputValue";
@@ -114,10 +85,10 @@ export default class FontSize implements IComponent {
         if (!isNaN(Number(input.value))) {
           FontSizeStore.setStyleSize(inputValue);
         }
-        FontSizeStore.closeInput();
+        this.modal.closeModal();
       }),
     );
-    button.textContent = "확인";
+    button.textContent = "submit";
     this.inputWrapper.appendChild(input);
     this.inputWrapper.appendChild(button);
   }

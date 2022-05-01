@@ -94,10 +94,10 @@ export const findElementByType = (target: HTMLElement, type: string) => {
   return null;
 };
 
-export const findImageByParentNode = (target: HTMLElement) => {
+export const findResizeNodeByParentNode = (target: HTMLElement) => {
   let tmpTarget = target;
   while (tmpTarget) {
-    if (tmpTarget.nodeName === "IMG") return tmpTarget;
+    if (tmpTarget.nodeName === "IMG" || tmpTarget.dataset.nodeName === "IFRAME") return tmpTarget;
     tmpTarget = tmpTarget.parentElement;
   }
   return null;
