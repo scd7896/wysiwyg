@@ -2,7 +2,7 @@ import { onSubmit } from "web-form-helper";
 import { RangeSingleton } from "../../../model";
 import VideoStore from "../../../model/VideoStore";
 import { setStyle } from "../../../utils/dom";
-import { getHostName } from "../../../utils/string";
+import { getHostName, queryParse } from "../../../utils/string";
 import SubModal from "../../SubModal/SubModal";
 
 class Video {
@@ -50,9 +50,12 @@ class Video {
         switch (VideoStore.state.mode) {
           case "url":
             const hostName = getHostName(arg.url);
-            console.log(hostName);
             if (hostName === "youtu.be") {
               const contents = arg.url.split("/").pop();
+              this.embeddedYoutube(contents);
+            }
+            if (hostName === "www.youtube.com") {
+              const contents = queryParse(arg.url).v;
               this.embeddedYoutube(contents);
             }
         }
@@ -98,6 +101,7 @@ class Video {
     wrapper.appendChild(clickedDummy);
     wrapper.appendChild(iframe);
     RangeSingleton.getInstance().insertNodeAndFoucs(wrapper);
+    this.modal.closeModal();
   }
 
   private renderUrlFormContents() {
