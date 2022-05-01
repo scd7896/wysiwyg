@@ -92,13 +92,12 @@ class Video {
     const video = document.createElement("video");
     video.src = url;
     video.controls = true;
-    const clickedDummy = document.createElement("div");
     setStyle(video, {
       width: `100%`,
       height: `100%`,
       display: "block",
     });
-    wrapper.appendChild(clickedDummy);
+
     wrapper.appendChild(video);
     RangeSingleton.getInstance().insertNodeAndFoucs(wrapper);
     this.modal.closeModal();

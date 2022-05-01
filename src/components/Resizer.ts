@@ -53,8 +53,8 @@ export default class ImageResizer {
         top: targetNode.offsetTop - 2 + "px",
         left: targetNode.offsetLeft - 2 + "px",
         display: "block",
-        width: clientRects.width + 4 + "px",
-        height: clientRects.height + 4 + "px",
+        width: clientRects.width + 8 + "px",
+        height: clientRects.height + 8 + "px",
       });
     } else {
       setStyle(this.wrapper, {
