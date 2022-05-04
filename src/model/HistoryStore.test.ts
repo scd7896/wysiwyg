@@ -17,11 +17,12 @@ describe("HistorStore Test", () => {
       { line: 1, type: "insert", value: firstArray[1] },
       { line: 2, type: "insert", value: firstArray[2] },
     ]);
+    expect(HistoryStore.currentChild).toEqual(firstArray);
   });
 
   it("2차 string 추가 테스트", () => {
     HistoryStore.setNextChild(secondArray);
-    // expect(HistoryStore.undoHistory[1].length).toBe(1);
-    expect(HistoryStore.undoHistory[0]).toEqual([{ line: 1, type: "delete", value: firstArray[1] }]);
+
+    expect(HistoryStore.undoHistory[1]).toEqual([{ line: 1, type: "delete", value: firstArray[1] }]);
   });
 });
