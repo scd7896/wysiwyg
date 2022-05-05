@@ -74,7 +74,6 @@ class HistoryStore {
       /**
        * nextChild에서 current의 포인트의 밸류와 같은 값을 찾고 찾을 경우
        * 다음의 nextChild는 result + 1 값으로 설정
-       * -1 일경우 현재 위치에서 + 1로 설정
        */
       const currntToNextChildCheck = findByAfterIndex(nextChild, this.currentChild[currentChildIndex], nextChildIndex);
       if (currntToNextChildCheck.result !== -1) {
@@ -93,7 +92,6 @@ class HistoryStore {
       /**
        * currentChild에서 next의 포인터값과 같은 값을 찾고 찾을 경우
        * 다음의 currentIndex는 result + 1로 설정
-       * -1 일경우 현재  현재의 +1로 설정
        */
       const nextToCurrentCheck = findByAfterIndex(this.currentChild, nextChild[nextChildIndex], currentChildIndex);
       if (nextToCurrentCheck.result !== -1) {
@@ -109,6 +107,9 @@ class HistoryStore {
         continue;
       }
 
+      /**
+       * 둘다 -1일 경우 current는 delete로 next는 insert로 설정하고 둘다 1씩 늘림
+       */
       if (currntToNextChildCheck.result === -1 && nextToCurrentCheck.result === -1) {
         diff.push({
           value: this.currentChild[currentChildIndex],
