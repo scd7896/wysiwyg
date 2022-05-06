@@ -1,4 +1,5 @@
 import { findByAfterIndex } from "../utils/array";
+import { BaseStore } from "./BaseStore";
 
 interface IDiff {
   line: number;
@@ -6,25 +7,102 @@ interface IDiff {
   type: "insert" | "delete";
 }
 
-class HistoryStore {
+class HistoryState {}
+
+class HistoryStore extends BaseStore<HistoryState> {
   currentChild: string[];
   undoHistory: IDiff[][];
   redoHistory: IDiff[][];
 
   constructor() {
+    super(new HistoryState());
     this.currentChild = [];
     this.undoHistory = [];
     this.redoHistory = [];
   }
 
-  setNextChild(childStringArray: string[]) {
-    const diff = this.diffChild(childStringArray);
-    diff.sort((a, b) => a.line - b.line);
-    this.undoHistory.push(diff);
-    this.currentChild = childStringArray;
+  undo() {
+    if (this.undoHistory.length) {
+      const history = this.undoHistory.pop();
+      const insertMap = history
+        .filter((diff) => diff.type === "insert")
+        .reduce<Record<number, boolean>>((acc, diff) => {
+          acc[diff.line] = true;
+          return acc;
+        }, {});
+
+      const removeMap = history
+        .filter((diff) => diff.type === "delete")
+        .reduce<Record<number, string>>((acc, diff) => {
+          acc[diff.line] = diff.value;
+          return acc;
+        }, {});
+      const result: string[] = [];
+      for (let i = 0; i < this.currentChild.length; i++) {
+        if (removeMap[i] !== undefined) {
+          result.push(removeMap[i]);
+        }
+        if (!insertMap[i]) {
+          result.push(this.currentChild[i]);
+        }
+      }
+
+      this.currentChild = result;
+      this.redoHistory.push(history);
+      this.setState({});
+    }
   }
 
-  diffChild(nextChild: string[]) {
+  redo() {
+    if (this.redoHistory.length) {
+      const history = this.redoHistory.pop();
+      const insertMap = history
+        .filter((diff) => diff.type === "insert")
+        .reduce<Record<number, string>>((acc, diff) => {
+          acc[diff.line] = diff.value;
+          return acc;
+        }, {});
+
+      const removeMap = history
+        .filter((diff) => diff.type === "delete")
+        .reduce<Record<number, boolean>>((acc, diff) => {
+          acc[diff.line] = true;
+          return acc;
+        }, {});
+      const result: string[] = [];
+      for (let i = 0; i < this.currentChild.length; i++) {
+        if (insertMap[i] !== undefined) {
+          result.push(insertMap[i]);
+        }
+        if (!removeMap[i]) {
+          result.push(this.currentChild[i]);
+        }
+      }
+
+      this.currentChild = result;
+      this.undoHistory.push(history);
+      this.setState({});
+    }
+  }
+
+  setNextChild(childStringArray: string[]) {
+    const diff = this.diffChild(childStringArray);
+    this.redoHistory = [];
+    diff.sort((a, b) => {
+      if (a.line === b.line) {
+        if (a.type === "delete") return -1;
+        return 1;
+      }
+      return a.line - b.line;
+    });
+    this.undoHistory.push(diff);
+    this.setState({});
+
+    this.currentChild = childStringArray;
+    return diff;
+  }
+
+  private diffChild(nextChild: string[]) {
     const diff: IDiff[] = [];
     let nextChildIndex = 0;
     let currentChildIndex = 0;
