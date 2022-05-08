@@ -1,4 +1,5 @@
 import { IComponent } from "../../model/BaseStore";
+import HistoryStore from "../../model/HistoryStore";
 import { setStyle } from "../../utils/dom";
 
 export default class WriteBoard implements IComponent {
@@ -23,7 +24,31 @@ export default class WriteBoard implements IComponent {
     });
     this.board.contentEditable = "true";
     this.board.classList.add("board");
-    this.board.addEventListener("keydown", (e: any) => {
+    this.board.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === "z" || e.key === "Z") {
+          e.preventDefault();
+
+          if (e.shiftKey) {
+            const child = HistoryStore.redo();
+            if (child) {
+              this.board.innerHTML = child.join("");
+            }
+          } else {
+            const child = HistoryStore.undo();
+            if (child) {
+              this.board.innerHTML = child.join("");
+            }
+          }
+        }
+        return;
+      }
+
+      const result: string[] = [];
+      this.board.childNodes.forEach((child: HTMLElement) => {
+        result.push(child.outerHTML);
+      });
+      HistoryStore.setNextChild(result, true);
       this.hiddenTextArea.value = this.board.innerHTML;
       if (
         this.board.childNodes.length === 0 ||

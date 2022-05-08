@@ -112,11 +112,10 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     if (hasContains(board, this.range.startContainer) && hasContains(board, this.range.endContainer)) {
       this.range.insertNode(node);
       this.changeFocusNode(node);
-      const boardChildsString: string[] = [];
-
-      board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
-      HistoryStore.setNextChild(boardChildsString);
     }
+    const boardChildsString: string[] = [];
+    board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
+    HistoryStore.setNextChild(boardChildsString);
   }
 
   changeFocusNode(node: Node) {
