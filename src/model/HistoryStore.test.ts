@@ -1,6 +1,7 @@
 import HistoryStore from "./HistoryStore";
 const firstArray = ["abcdefg", "hijklmnok", "123456"];
 const secondArray = ["abcdefg", "123456"];
+const thirdArray = ["abcdefg", "123456", "abcdefg"];
 
 describe("HistorStore Test", () => {
   it("1차 string 추가 테스트", () => {
@@ -30,5 +31,21 @@ describe("HistorStore Test", () => {
   it("redo 테스트", () => {
     HistoryStore.redo();
     expect(HistoryStore.currentChild).toEqual(secondArray);
+  });
+
+  it("3차 추가", () => {
+    const result = HistoryStore.setNextChild(thirdArray);
+
+    expect(result).toEqual([{ line: 2, type: "insert", value: thirdArray[2] }]);
+  });
+
+  it("undo 테스트", () => {
+    HistoryStore.undo();
+    expect(HistoryStore.currentChild).toEqual(secondArray);
+  });
+
+  it("redu 테스트", () => {
+    HistoryStore.redo();
+    expect(HistoryStore.currentChild).toEqual(thirdArray);
   });
 });

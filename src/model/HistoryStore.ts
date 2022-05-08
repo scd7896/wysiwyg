@@ -26,10 +26,12 @@ class HistoryStore extends BaseStore<HistoryState> {
   undo() {
     if (this.undoHistory.length) {
       const history = this.undoHistory.pop();
+      let max = this.currentChild.length;
       const insertMap = history
         .filter((diff) => diff.type === "insert")
         .reduce<Record<number, boolean>>((acc, diff) => {
           acc[diff.line] = true;
+          if (max < diff.line) max = diff.line + 1;
           return acc;
         }, {});
 
@@ -37,10 +39,11 @@ class HistoryStore extends BaseStore<HistoryState> {
         .filter((diff) => diff.type === "delete")
         .reduce<Record<number, string>>((acc, diff) => {
           acc[diff.line] = diff.value;
+          if (max < diff.line) max = diff.line + 1;
           return acc;
         }, {});
       const result: string[] = [];
-      for (let i = 0; i < this.currentChild.length; i++) {
+      for (let i = 0; i < max; i++) {
         if (removeMap[i] !== undefined) {
           result.push(removeMap[i]);
         }
@@ -51,17 +54,19 @@ class HistoryStore extends BaseStore<HistoryState> {
 
       this.currentChild = result;
       this.redoHistory.push(history);
-      this.setState({});
+      return this.currentChild;
     }
   }
 
   redo() {
     if (this.redoHistory.length) {
       const history = this.redoHistory.pop();
+      let max = this.currentChild.length;
       const insertMap = history
         .filter((diff) => diff.type === "insert")
         .reduce<Record<number, string>>((acc, diff) => {
           acc[diff.line] = diff.value;
+          if (max < diff.line + 1) max = diff.line + 1;
           return acc;
         }, {});
 
@@ -69,10 +74,11 @@ class HistoryStore extends BaseStore<HistoryState> {
         .filter((diff) => diff.type === "delete")
         .reduce<Record<number, boolean>>((acc, diff) => {
           acc[diff.line] = true;
+          if (max < diff.line + 1) max = diff.line + 1;
           return acc;
         }, {});
       const result: string[] = [];
-      for (let i = 0; i < this.currentChild.length; i++) {
+      for (let i = 0; i < max; i++) {
         if (insertMap[i] !== undefined) {
           result.push(insertMap[i]);
         }
@@ -83,7 +89,7 @@ class HistoryStore extends BaseStore<HistoryState> {
 
       this.currentChild = result;
       this.undoHistory.push(history);
-      this.setState({});
+      return this.currentChild;
     }
   }
 
@@ -95,7 +101,8 @@ class HistoryStore extends BaseStore<HistoryState> {
 
       this.timer = setTimeout(() => {
         this.diffToNextChild(childStringArray);
-      }, 3 * 1000);
+      }, 500);
+
       return [];
     } else {
       if (this.timer) {
@@ -110,6 +117,7 @@ class HistoryStore extends BaseStore<HistoryState> {
 
   private diffToNextChild(childStringArray: string[]) {
     const diff = this.diffChild(childStringArray);
+    if (diff.length === 0) return [];
     this.redoHistory = [];
     diff.sort((a, b) => {
       if (a.line === b.line) {
