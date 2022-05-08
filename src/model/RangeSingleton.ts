@@ -1,12 +1,6 @@
-import {
-  findSpanStyleRemove,
-  hasContains,
-  setStyle,
-  setStyleFullText,
-  setRangeContainerStyle,
-  getParentStyleValues,
-} from "../utils/dom";
+import { findSpanStyleRemove, hasContains, setStyle, setRangeContainerStyle, getParentStyleValues } from "../utils/dom";
 import { BaseStore } from "./BaseStore";
+import HistoryStore from "./HistoryStore";
 
 class RangeSingletonState {
   textDecorationValues: string[];
@@ -82,6 +76,10 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.caretEventListener(styles);
     }
     this.initializeTmp();
+    const board = this.parent.querySelector(".board");
+    const boardChildsString: string[] = [];
+    board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
+    HistoryStore.setNextChild(boardChildsString);
   }
 
   insertImage(src: string) {
@@ -119,6 +117,9 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.range.insertNode(node);
       this.changeFocusNode(node);
     }
+    const boardChildsString: string[] = [];
+    board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
+    HistoryStore.setNextChild(boardChildsString);
   }
 
   changeFocusNode(node: Node) {
