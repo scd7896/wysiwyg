@@ -14,6 +14,8 @@ class HistoryStore extends BaseStore<HistoryState> {
   undoHistory: IDiff[][];
   redoHistory: IDiff[][];
 
+  timer: any;
+
   constructor() {
     super(new HistoryState());
     this.currentChild = [];
@@ -85,7 +87,28 @@ class HistoryStore extends BaseStore<HistoryState> {
     }
   }
 
-  setNextChild(childStringArray: string[]) {
+  setNextChild(childStringArray: string[], isDebounce?: boolean) {
+    if (isDebounce) {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+
+      this.timer = setTimeout(() => {
+        this.diffToNextChild(childStringArray);
+      }, 3 * 1000);
+      return [];
+    } else {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+    }
+
+    const result = this.diffToNextChild(childStringArray);
+
+    return result;
+  }
+
+  private diffToNextChild(childStringArray: string[]) {
     const diff = this.diffChild(childStringArray);
     this.redoHistory = [];
     diff.sort((a, b) => {
