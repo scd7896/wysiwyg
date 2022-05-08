@@ -76,6 +76,10 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.caretEventListener(styles);
     }
     this.initializeTmp();
+    const board = this.parent.querySelector(".board");
+    const boardChildsString: string[] = [];
+    board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
+    HistoryStore.setNextChild(boardChildsString);
   }
 
   insertImage(src: string) {
