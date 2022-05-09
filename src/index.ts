@@ -5,6 +5,7 @@ import HistoryStore from "./model/HistoryStore";
 import { findResizeNodeByParentNode, setStyle } from "./utils/dom";
 
 export class WYSIWYG {
+  root: HTMLElement;
   constructor(target: HTMLElement | string, options?: any) {
     const element = typeof target === "string" ? document.querySelector(target) : (target as HTMLElement);
     EventSingleton.getInstance(element as HTMLElement);
@@ -16,6 +17,7 @@ export class WYSIWYG {
     new Menu(element, options);
     new WriteBoard(element);
     new Resizer(element);
+    this.root = element as HTMLElement;
     element.addEventListener("click", this.clickEventListener);
   }
 
@@ -37,11 +39,19 @@ export class WYSIWYG {
   }
 
   undo() {
-    return HistoryStore.undo();
+    const result = HistoryStore.undo();
+    if (result) {
+      const board = this.root.querySelector(".board");
+      board.innerHTML = result.join("");
+    }
   }
 
   redo() {
-    return HistoryStore.redo();
+    const result = HistoryStore.redo();
+    if (result) {
+      const board = this.root.querySelector(".board");
+      board.innerHTML = result.join("");
+    }
   }
 
   get undoHistory() {
