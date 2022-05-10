@@ -1,6 +1,6 @@
-import { onSubmit } from "web-form-helper";
 import { RangeSingleton } from "../../../model";
 import VideoStore, { TVideoInsertMode } from "../../../model/VideoStore";
+import { IEditorOptions, IVideoOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
 import { getHostName, queryParse } from "../../../utils/string";
 import SubModal from "../../SubModal/SubModal";
@@ -13,10 +13,10 @@ class Video {
   private form: HTMLDivElement;
 
   private input: HTMLInputElement;
-  private options: any;
+  private options: IVideoOptions;
 
-  constructor(parent: HTMLElement, options?: any) {
-    this.options = options;
+  constructor(parent: HTMLElement, options?: IEditorOptions) {
+    this.options = options.video;
     this.wrapper = document.createElement("div");
     this.parent = parent;
     this.form = document.createElement("div");
@@ -196,8 +196,8 @@ class Video {
           }
         case "file":
           let url = "";
-          if (this.options?.video?.onUpload) {
-            url = await this.options?.video?.onUpload(this.input.files[0]);
+          if (this.options?.onUpload) {
+            url = await this.options?.onUpload(this.input.files[0]);
           } else {
             url = URL.createObjectURL(this.input.files[0]);
           }

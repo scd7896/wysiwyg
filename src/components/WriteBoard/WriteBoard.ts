@@ -1,5 +1,6 @@
 import { IComponent } from "../../model/BaseStore";
 import HistoryStore from "../../model/HistoryStore";
+import { IEditorOptions } from "../../types";
 import { setStyle } from "../../utils/dom";
 
 export default class WriteBoard implements IComponent {
@@ -7,9 +8,10 @@ export default class WriteBoard implements IComponent {
   private hiddenTextArea: HTMLTextAreaElement;
   private parent: Element;
 
-  constructor(parent: Element) {
+  constructor(parent: Element, options: IEditorOptions) {
     this.parent = parent;
     this.render();
+    this.board.innerHTML = options.defaultValue;
   }
 
   private textAreaSetting() {

@@ -1,10 +1,13 @@
 import { WriteBoard, Menu, Resizer } from "./components";
 import EventSingleton from "./event/EventSingleton";
 import { ImageResizerStore, RangeSingleton } from "./model";
+import HistoryStore from "./model/HistoryStore";
+import { IEditorOptions } from "./types";
 import { findResizeNodeByParentNode, setStyle } from "./utils/dom";
 
 export class WYSIWYG {
-  constructor(target: HTMLElement | string, options?: any) {
+  root: HTMLElement;
+  constructor(target: HTMLElement | string, options?: IEditorOptions) {
     const element = typeof target === "string" ? document.querySelector(target) : (target as HTMLElement);
     EventSingleton.getInstance(element as HTMLElement);
     RangeSingleton.getInstance(element as HTMLElement);
@@ -13,8 +16,9 @@ export class WYSIWYG {
       position: "relative",
     });
     new Menu(element, options);
-    new WriteBoard(element);
+    new WriteBoard(element, options);
     new Resizer(element);
+    this.root = element as HTMLElement;
     element.addEventListener("click", this.clickEventListener);
   }
 
@@ -26,4 +30,36 @@ export class WYSIWYG {
       ImageResizerStore.setInitlization();
     }
   };
+
+  insertNode(element: HTMLElement) {
+    RangeSingleton.getInstance().insertNodeAndFoucs(element);
+  }
+
+  setRangeStyle(style: Record<string, string>) {
+    RangeSingleton.getInstance().setStyle(style);
+  }
+
+  undo() {
+    const result = HistoryStore.undo();
+    if (result) {
+      const board = this.root.querySelector(".board");
+      board.innerHTML = result.join("");
+    }
+  }
+
+  redo() {
+    const result = HistoryStore.redo();
+    if (result) {
+      const board = this.root.querySelector(".board");
+      board.innerHTML = result.join("");
+    }
+  }
+
+  get undoHistory() {
+    return HistoryStore.undoHistory;
+  }
+
+  get redoHistory() {
+    return HistoryStore.redoHistory;
+  }
 }

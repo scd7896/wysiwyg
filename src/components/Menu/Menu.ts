@@ -3,6 +3,7 @@ import { IComponent } from "../../model/BaseStore";
 import { MenuState } from "../../model/MenuStore";
 import * as menuFunction from "./menuFunction";
 import { css } from "@emotion/css";
+import { IEditorOptions } from "../../types";
 
 const menuClass = css`
   display: flex;
@@ -20,9 +21,9 @@ const menuClass = css`
 `;
 export default class Menu implements IComponent {
   private parent: Element;
-  private options: any;
+  private options: IEditorOptions;
 
-  constructor(parent: Element, options?: any) {
+  constructor(parent: Element, options?: IEditorOptions) {
     this.parent = parent;
     this.options = options;
     this.render();
