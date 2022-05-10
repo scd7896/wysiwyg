@@ -1,5 +1,6 @@
 import { ImageStore, RangeSingleton } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
+import { IEditorOptions, IImageOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
 import SubModal from "../../SubModal/SubModal";
 
@@ -12,10 +13,10 @@ export default class Image implements IComponent {
   private footerNav: HTMLDivElement;
   private formBody: HTMLDivElement;
   private urlInput: HTMLInputElement;
-  private imageOptions?: any;
+  private imageOptions?: IImageOptions;
   private modal: SubModal;
 
-  constructor(parent: HTMLElement, options?: any) {
+  constructor(parent: HTMLElement, options?: IEditorOptions) {
     this.imageOptions = options?.image;
     this.parent = parent;
     this.wrapper = document.createElement("div");

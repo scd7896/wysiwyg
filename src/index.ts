@@ -2,11 +2,12 @@ import { WriteBoard, Menu, Resizer } from "./components";
 import EventSingleton from "./event/EventSingleton";
 import { ImageResizerStore, RangeSingleton } from "./model";
 import HistoryStore from "./model/HistoryStore";
+import { IEditorOptions } from "./types";
 import { findResizeNodeByParentNode, setStyle } from "./utils/dom";
 
 export class WYSIWYG {
   root: HTMLElement;
-  constructor(target: HTMLElement | string, options?: any) {
+  constructor(target: HTMLElement | string, options?: IEditorOptions) {
     const element = typeof target === "string" ? document.querySelector(target) : (target as HTMLElement);
     EventSingleton.getInstance(element as HTMLElement);
     RangeSingleton.getInstance(element as HTMLElement);
@@ -15,7 +16,7 @@ export class WYSIWYG {
       position: "relative",
     });
     new Menu(element, options);
-    new WriteBoard(element);
+    new WriteBoard(element, options);
     new Resizer(element);
     this.root = element as HTMLElement;
     element.addEventListener("click", this.clickEventListener);
