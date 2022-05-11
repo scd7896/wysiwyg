@@ -1,3 +1,4 @@
+import { WYSIWYG } from "..";
 import {
   findSpanStyleRemove,
   hasContains,
@@ -8,15 +9,14 @@ import {
   findNodeNameRemove,
 } from "../utils/dom";
 import { BaseStore } from "./BaseStore";
-import HistoryStore from "./HistoryStore";
 
-class RangeSingletonState {
+class RangeState {
   textDecorationValues: string[];
   constructor() {
     this.textDecorationValues = [];
   }
 }
-class RangeSingleton extends BaseStore<RangeSingletonState> {
+class RangeStore extends BaseStore<RangeState> {
   selection: Selection;
   type: string;
   range: Range;
@@ -34,11 +34,12 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
 
   nextRange: Range;
 
-  private static instance: RangeSingleton;
+  root: WYSIWYG;
 
-  private constructor(parent?: HTMLElement) {
-    super(new RangeSingletonState());
+  constructor(parent?: HTMLElement, root?: WYSIWYG) {
+    super(new RangeState());
     this.parent = parent;
+    this.root = root;
     this.rangeNodes = [];
 
     document.addEventListener("selectionchange", (e) => {
@@ -64,12 +65,6 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     });
   }
 
-  static getInstance(parent?: HTMLElement) {
-    if (this.instance) return this.instance;
-    this.instance = new this(parent);
-    return this.instance;
-  }
-
   setStyle(styles: Record<string, string>, element?: HTMLElement) {
     this.loadTmp();
 
@@ -89,7 +84,7 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     const board = this.parent.querySelector(".board");
     const boardChildsString: string[] = [];
     board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
-    HistoryStore.setNextChild(boardChildsString);
+    this.root.history.setNextChild(boardChildsString);
   }
 
   insertImage(src: string) {
@@ -129,7 +124,7 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.changeFocusNode(node);
       const boardChildsString: string[] = [];
       board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
-      HistoryStore.setNextChild(boardChildsString);
+      this.root.history.setNextChild(boardChildsString);
     }
   }
 
@@ -244,4 +239,4 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
   }
 }
 
-export default RangeSingleton;
+export default RangeStore;

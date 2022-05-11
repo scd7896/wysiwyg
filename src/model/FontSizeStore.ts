@@ -19,4 +19,4 @@ class FontSizeStore extends BaseStore<FontSizeState> {
   }
 }
 
-export default new FontSizeStore();
+export default FontSizeStore;

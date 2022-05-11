@@ -241,4 +241,4 @@ class HistoryStore extends BaseStore<HistoryState> {
   }
 }
 
-export default new HistoryStore();
+export default HistoryStore;

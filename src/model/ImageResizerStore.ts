@@ -25,4 +25,4 @@ class ImageResizerStore extends BaseStore<ImageResizeState> {
   }
 }
 
-export default new ImageResizerStore();
+export default ImageResizerStore;

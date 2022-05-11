@@ -1,3 +1,4 @@
+import { WYSIWYG } from "../../..";
 import { ImageStore, RangeSingleton } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { IEditorOptions, IImageOptions } from "../../../types";
@@ -15,10 +16,13 @@ export default class Image implements IComponent {
   private urlInput: HTMLInputElement;
   private imageOptions?: IImageOptions;
   private modal: SubModal;
+  private store: ImageStore;
+  private root: WYSIWYG
 
-  constructor(parent: HTMLElement, options?: IEditorOptions) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: WYSIWYG) {
     this.imageOptions = options?.image;
     this.parent = parent;
+    this.root = root;
     this.wrapper = document.createElement("div");
     this.toggleButton = document.createElement("button");
     this.imageForm = document.createElement("div");
@@ -33,6 +37,7 @@ export default class Image implements IComponent {
     });
 
     this.formBody = document.createElement("div");
+    this.store = new ImageStore();
 
     this.footerNav = document.createElement("div");
     const submitButton = document.createElement("button");
@@ -44,11 +49,12 @@ export default class Image implements IComponent {
     this.imageForm.appendChild(this.footerNav);
 
     this.wrapper.appendChild(this.toggleButton);
-    this.modal = new SubModal(this.wrapper, this.imageForm);
+    this.modal = new SubModal(this.wrapper, this.imageForm, root);
 
     this.parent.appendChild(this.wrapper);
+    
     this.render();
-    ImageStore.subscribe(this);
+    this.store.subscribe(this)
   }
 
   update() {
@@ -74,7 +80,7 @@ export default class Image implements IComponent {
     this.headerNav.addEventListener("click", (e) => {
       const target = findElementByType(e.target as HTMLElement, "type");
       if (target) {
-        ImageStore.setMode(target.dataset.value as any);
+        this.store.setMode(target.dataset.value as any);
       }
     });
   }
@@ -92,7 +98,7 @@ export default class Image implements IComponent {
         cursor: "pointer",
       });
 
-      if (ImageStore.state.mode === button.dataset.value) {
+      if (this.store.state.mode === button.dataset.value) {
         setStyle(button, {
           "background-color": "#0098f7",
         });
@@ -123,7 +129,7 @@ export default class Image implements IComponent {
       cursor: "pointer",
     });
 
-    if (ImageStore.state.mode === "file") {
+    if (this.store.state.mode === "file") {
       setStyle(submitButton, {
         display: "none",
       });
@@ -138,7 +144,7 @@ export default class Image implements IComponent {
     const fragment = document.createDocumentFragment();
     this.formBody.innerHTML = "";
     let input = document.createElement("input");
-    if (ImageStore.state.mode === "file") {
+    if (this.store.state.mode === "file") {
       input.type = "file";
       input.name = "file";
       this.urlInput = undefined;
@@ -162,7 +168,7 @@ export default class Image implements IComponent {
   }
 
   insertImage = (url: string) => {
-    RangeSingleton.getInstance().insertImage(url);
+    this.root.range.insertImage(url);
     this.modal.closeModal();
   };
 }

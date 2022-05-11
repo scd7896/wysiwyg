@@ -20,4 +20,4 @@ class FontColorStore extends BaseStore<FontColorState> {
   }
 }
 
-export default new FontColorStore();
+export default FontColorStore;
