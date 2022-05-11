@@ -1,11 +1,10 @@
-import { WYSIWYG } from "../../..";
-import EventSingleton from "../../../event/Event";
-import { RangeSingleton } from "../../../model";
+import { IRootStores } from "../../..";
+
 import { findParentByNodeName } from "../../../utils/dom";
 
 class List {
-  root?: WYSIWYG;
-  constructor(parent: HTMLElement, options?: any, root?: WYSIWYG) {
+  root?: IRootStores;
+  constructor(parent: HTMLElement, options?: any, root?: IRootStores) {
     const button = document.createElement("button");
     this.root = root;
     button.textContent = "list";

@@ -1,4 +1,4 @@
-import { WYSIWYG } from "..";
+import { IRootStores } from "..";
 import {
   findSpanStyleRemove,
   hasContains,
@@ -34,9 +34,9 @@ class RangeStore extends BaseStore<RangeState> {
 
   nextRange: Range;
 
-  root: WYSIWYG;
+  root: IRootStores;
 
-  constructor(parent?: HTMLElement, root?: WYSIWYG) {
+  constructor(parent?: HTMLElement, root?: IRootStores) {
     super(new RangeState());
     this.parent = parent;
     this.root = root;

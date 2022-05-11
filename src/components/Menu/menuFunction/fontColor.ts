@@ -1,4 +1,4 @@
-import { WYSIWYG } from "../../..";
+import { IRootStores } from "../../..";
 import { IEditorOptions } from "../../../types";
 import { setStyle } from "../../../utils/dom";
 
@@ -8,9 +8,9 @@ export default class FontColor {
   private applyButton: HTMLButtonElement;
   private settingButton: HTMLButtonElement;
   private colorPicker: HTMLInputElement;
-  private root: WYSIWYG
+  private root: IRootStores;
 
-  constructor(parent: HTMLElement, options?: IEditorOptions, root?: WYSIWYG) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     this.parent = parent;
     this.root = root;
 

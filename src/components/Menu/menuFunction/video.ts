@@ -1,5 +1,4 @@
-import { WYSIWYG } from "../../..";
-import { RangeSingleton } from "../../../model";
+import { IRootStores } from "../../..";
 import VideoStore, { TVideoInsertMode } from "../../../model/VideoStore";
 import { IEditorOptions, IVideoOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
@@ -16,9 +15,9 @@ class Video {
   private input: HTMLInputElement;
   private options: IVideoOptions;
   private store: VideoStore;
-  private root: WYSIWYG;
+  private root: IRootStores;
 
-  constructor(parent: HTMLElement, options?: IEditorOptions, root?: WYSIWYG) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     this.root = root;
     this.options = options.video;
     this.wrapper = document.createElement("div");

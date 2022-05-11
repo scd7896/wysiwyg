@@ -1,4 +1,4 @@
-import { WYSIWYG } from "../..";
+import { IRootStores } from "../..";
 import { IComponent } from "../../model/BaseStore";
 import { IEditorOptions } from "../../types";
 import { setStyle } from "../../utils/dom";
@@ -7,9 +7,9 @@ export default class WriteBoard implements IComponent {
   private board: HTMLElement;
   private hiddenTextArea: HTMLTextAreaElement;
   private parent: Element;
-  private root: WYSIWYG
+  private root: IRootStores;
 
-  constructor(parent: Element, options: IEditorOptions, root: WYSIWYG) {
+  constructor(parent: Element, options: IEditorOptions, root: IRootStores) {
     this.parent = parent;
     this.root = root;
     this.render();

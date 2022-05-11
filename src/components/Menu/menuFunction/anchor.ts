@@ -1,4 +1,5 @@
-import { RangeSingleton } from "../../../model";
+import { IRootStores } from "../../..";
+import { IEditorOptions } from "../../../types";
 import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
 
@@ -7,13 +8,15 @@ export default class Anchor {
   private wrapper: HTMLElement;
   private inputForm: HTMLDivElement;
   private button: HTMLButtonElement;
+  private root: IRootStores;
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     this.wrapper = document.createElement("div");
+    this.root = root;
     this.inputForm = document.createElement("div");
     this.button = document.createElement("button");
     this.button.textContent = "anchor";
-    this.modal = new SubModal(this.wrapper, this.inputForm);
+    this.modal = new SubModal(this.wrapper, this.inputForm, this.root);
 
     this.wrapper.appendChild(this.button);
     parent.appendChild(this.wrapper);
@@ -36,7 +39,7 @@ export default class Anchor {
     const button = document.createElement("button");
     button.textContent = "Insert";
     button.addEventListener("click", () => {
-      const instance = RangeSingleton.getInstance();
+      const instance = this.root.range;
       const atag = document.createElement("a");
       atag.href = urlInput.value;
       if (instance.type !== "Range") atag.textContent = textInput.value;

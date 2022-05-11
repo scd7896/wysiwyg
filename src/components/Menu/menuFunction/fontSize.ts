@@ -1,5 +1,5 @@
-import { WYSIWYG } from "../../..";
-import { RangeSingleton, FontSizeStore } from "../../../model";
+import { IRootStores } from "../../..";
+import { FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { IEditorOptions } from "../../../types";
 import { setStyle } from "../../../utils/dom";
@@ -14,11 +14,11 @@ export default class FontSize implements IComponent {
   private modal: SubModal;
   private store: FontSizeStore;
 
-  private root: WYSIWYG
+  private root: IRootStores;
 
-  constructor(parent: HTMLElement, options?: IEditorOptions, root?: WYSIWYG) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     this.parent = parent;
-    this.root = root
+    this.root = root;
     this.store = new FontSizeStore();
     this.render();
     this.store.subscribe(this);
