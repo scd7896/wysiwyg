@@ -1,3 +1,4 @@
+import { WYSIWYG } from "../../..";
 import { RangeSingleton } from "../../../model";
 import VideoStore, { TVideoInsertMode } from "../../../model/VideoStore";
 import { IEditorOptions, IVideoOptions } from "../../../types";
@@ -14,18 +15,22 @@ class Video {
 
   private input: HTMLInputElement;
   private options: IVideoOptions;
+  private store: VideoStore;
+  private root: WYSIWYG;
 
-  constructor(parent: HTMLElement, options?: IEditorOptions) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: WYSIWYG) {
+    this.root = root;
     this.options = options.video;
     this.wrapper = document.createElement("div");
     this.parent = parent;
     this.form = document.createElement("div");
-    this.modal = new SubModal(this.wrapper, this.form);
+    this.modal = new SubModal(this.wrapper, this.form, root);
     this.button = document.createElement("button");
     this.wrapper.appendChild(this.button);
     this.parent.appendChild(this.wrapper);
+    this.store = new VideoStore();
+    this.store.subscribe(this);
     this.render();
-    VideoStore.subscribe(this);
   }
 
   update() {
@@ -44,7 +49,7 @@ class Video {
   private formContentsRender() {
     this.form.innerHTML = "";
     this.renderHeaderContents();
-    switch (VideoStore.state.mode) {
+    switch (this.store.state.mode) {
       case "embedCode":
         break;
       case "file":
@@ -75,7 +80,7 @@ class Video {
     });
 
     wrapper.appendChild(video);
-    RangeSingleton.getInstance().insertNodeAndFoucs(wrapper);
+    this.root.range.insertNodeAndFoucs(wrapper);
     this.modal.closeModal();
   }
 
@@ -106,7 +111,7 @@ class Video {
     });
     wrapper.appendChild(clickedDummy);
     wrapper.appendChild(iframe);
-    RangeSingleton.getInstance().insertNodeAndFoucs(wrapper);
+    this.root.range.insertNodeAndFoucs(wrapper);
     this.modal.closeModal();
   }
 
@@ -163,7 +168,7 @@ class Video {
       const target = findElementByType(e.target, "type");
       if (target) {
         const type = target.dataset.value;
-        VideoStore.setMode(type as TVideoInsertMode);
+        this.store.setMode(type as TVideoInsertMode);
       }
     });
     this.form.appendChild(header);
@@ -183,7 +188,7 @@ class Video {
     });
     footer.appendChild(submitButton);
     submitButton.addEventListener("click", async () => {
-      switch (VideoStore.state.mode) {
+      switch (this.store.state.mode) {
         case "url":
           const hostName = getHostName(this.input.value);
           if (hostName === "youtu.be") {
