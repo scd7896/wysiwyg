@@ -1,4 +1,4 @@
-import { WYSIWYG } from "../..";
+import { IRootStores } from "../..";
 import SubModalStore from "../../model/SubModalStore";
 import { hasContains, setStyle } from "../../utils/dom";
 
@@ -7,9 +7,9 @@ class SubModal {
   private children: HTMLElement;
   private wrapper: HTMLElement;
   private parent: HTMLElement;
-  private root: WYSIWYG
+  private root: IRootStores;
 
-  constructor(parent: HTMLElement, children: HTMLElement, root: WYSIWYG) {
+  constructor(parent: HTMLElement, children: HTMLElement, root: IRootStores) {
     this.parent = parent;
     this.root = root;
     this.store = new SubModalStore();

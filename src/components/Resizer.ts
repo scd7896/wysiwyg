@@ -1,5 +1,4 @@
-import { WYSIWYG } from "..";
-import { ImageResizerStore } from "../model";
+import { IRootStores } from "..";
 import { findElementByType, setStyle } from "../utils/dom";
 
 export default class ImageResizer {
@@ -10,9 +9,9 @@ export default class ImageResizer {
   private currentYPoint: number;
   private board: HTMLDivElement;
   private targetNode: HTMLElement;
-  private root: WYSIWYG
+  private root: IRootStores;
 
-  constructor(parent: Element, root: WYSIWYG) {
+  constructor(parent: Element, root: IRootStores) {
     this.board = parent.querySelector(".board");
     this.wrapper = document.createElement("div");
     this.root = root;

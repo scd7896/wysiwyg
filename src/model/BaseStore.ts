@@ -5,7 +5,7 @@ export interface IComponent {
 
 export class BaseStore<T> {
   private listeners: IComponent[];
-  static timer: number;
+  static timer: any;
   public state: T;
   static activeListeners: IComponent[];
 

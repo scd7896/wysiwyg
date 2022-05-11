@@ -1,5 +1,5 @@
-import { WYSIWYG } from "../../..";
-import { ImageStore, RangeSingleton } from "../../../model";
+import { IRootStores } from "../../..";
+import { ImageStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { IEditorOptions, IImageOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
@@ -17,9 +17,9 @@ export default class Image implements IComponent {
   private imageOptions?: IImageOptions;
   private modal: SubModal;
   private store: ImageStore;
-  private root: WYSIWYG
+  private root: IRootStores;
 
-  constructor(parent: HTMLElement, options?: IEditorOptions, root?: WYSIWYG) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     this.imageOptions = options?.image;
     this.parent = parent;
     this.root = root;
@@ -52,9 +52,9 @@ export default class Image implements IComponent {
     this.modal = new SubModal(this.wrapper, this.imageForm, root);
 
     this.parent.appendChild(this.wrapper);
-    
+
     this.render();
-    this.store.subscribe(this)
+    this.store.subscribe(this);
   }
 
   update() {

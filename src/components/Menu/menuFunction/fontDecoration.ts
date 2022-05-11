@@ -1,14 +1,13 @@
-import { WYSIWYG } from "../../..";
-import { FontColorStore, RangeSingleton } from "../../../model";
+import { IRootStores } from "../../..";
 import { IEditorOptions } from "../../../types";
 import { findElementByType, removeStyles, setStyle } from "../../../utils/dom";
 
 export default class FontDecoration {
   private wrapper: HTMLDivElement;
   private buttons: HTMLButtonElement[];
-  root: WYSIWYG
+  root: IRootStores;
 
-  constructor(parent: HTMLElement, options?: IEditorOptions, root?: WYSIWYG) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     const wrapper = document.createElement("div");
     this.wrapper = wrapper;
     this.root = root;
