@@ -194,7 +194,7 @@ class RangeStore extends BaseStore<RangeState> {
           if (forSetElement) {
             const cloneNode = forSetElement.cloneNode(true) as HTMLElement;
             cloneNode.innerHTML = node.innerHTML;
-            node.appendChild(cloneNode);
+            if (node.nodeName !== "#text") node.replaceChildren(cloneNode);
             cloneNode.childNodes.forEach((child) => {
               if (child.nodeName !== "#text") {
                 findNodeNameRemove(child as HTMLElement, cloneNode.nodeName);

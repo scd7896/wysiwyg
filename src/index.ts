@@ -24,10 +24,11 @@ export class WYSIWYG {
     this.stores = {
       event: new EventObject(element as HTMLElement),
       history: new HistoryStore(),
-      range: new RangeSingleton(element as HTMLElement, this.stores),
+      range: new RangeSingleton(element as HTMLElement),
       imageResizeStore: new ImageResizerStore(),
       fontColorStore: new FontColorStore(),
     };
+    this.stores.range.root = this.stores;
 
     this.options = options;
 
