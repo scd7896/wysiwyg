@@ -11,7 +11,7 @@ export default class WriteBoard implements IComponent {
   constructor(parent: Element, options: IEditorOptions) {
     this.parent = parent;
     this.render();
-    this.board.innerHTML = options.defaultValue;
+    this.board.innerHTML = options.defaultValue || "";
   }
 
   private textAreaSetting() {
