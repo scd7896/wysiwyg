@@ -14,10 +14,9 @@ export interface IRootStores {
 }
 
 export class WYSIWYG {
-  root: HTMLElement;
-
-  options?: IEditorOptions;
-  stores: IRootStores;
+  private root: HTMLElement;
+  private options?: IEditorOptions;
+  private stores: IRootStores;
 
   constructor(target: HTMLElement | string, options?: IEditorOptions) {
     const element = typeof target === "string" ? document.querySelector(target) : (target as HTMLElement);
