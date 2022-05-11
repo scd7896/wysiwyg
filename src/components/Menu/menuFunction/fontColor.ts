@@ -1,4 +1,5 @@
-import { FontColorStore, RangeSingleton } from "../../../model";
+import { WYSIWYG } from "../../..";
+import { IEditorOptions } from "../../../types";
 import { setStyle } from "../../../utils/dom";
 
 export default class FontColor {
@@ -7,9 +8,11 @@ export default class FontColor {
   private applyButton: HTMLButtonElement;
   private settingButton: HTMLButtonElement;
   private colorPicker: HTMLInputElement;
+  private root: WYSIWYG
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: WYSIWYG) {
     this.parent = parent;
+    this.root = root;
 
     const wrapper = document.createElement("div");
     this.wrapper = wrapper;
@@ -28,14 +31,14 @@ export default class FontColor {
     this.parent.appendChild(wrapper);
 
     this.render();
-    FontColorStore.subscribe(this);
+    this.root.fontColorStore.subscribe(this);
   }
 
   render() {
     setStyle(this.applyButton, {
       width: "40px",
       height: "40px",
-      background: FontColorStore.state.color,
+      background: this.root.fontColorStore.state.color,
     });
 
     setStyle(this.colorPicker, {
@@ -52,18 +55,18 @@ export default class FontColor {
       this.colorPicker.click();
     });
     this.colorPicker.addEventListener("change", (e: any) => {
-      FontColorStore.setColor(e.target.value);
+      this.root.fontColorStore.setColor(e.target.value);
     });
     this.applyButton.addEventListener("click", () => {
-      RangeSingleton.getInstance().setStyle({
-        color: FontColorStore.state.color,
+      this.root.range.setStyle({
+        color: this.root.fontColorStore.state.color,
       });
     });
   }
 
   update() {
     setStyle(this.applyButton, {
-      background: FontColorStore.state.color,
+      background: this.root.fontColorStore.state.color,
     });
   }
 }

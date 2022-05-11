@@ -1,4 +1,4 @@
-import { RangeSingleton } from "../../model";
+import { WYSIWYG } from "../..";
 import SubModalStore from "../../model/SubModalStore";
 import { hasContains, setStyle } from "../../utils/dom";
 
@@ -7,9 +7,11 @@ class SubModal {
   private children: HTMLElement;
   private wrapper: HTMLElement;
   private parent: HTMLElement;
+  private root: WYSIWYG
 
-  constructor(parent: HTMLElement, children: HTMLElement) {
+  constructor(parent: HTMLElement, children: HTMLElement, root: WYSIWYG) {
     this.parent = parent;
+    this.root = root;
     this.store = new SubModalStore();
     this.children = children;
     this.store.subscribe(this);
@@ -17,7 +19,7 @@ class SubModal {
 
   update() {
     if (this.store.state.isOpen) {
-      RangeSingleton.getInstance().saveTmp();
+      this.root.range.saveTmp();
       this.wrapper = document.createElement("div");
       setStyle(this.wrapper, {
         position: "absolute",
@@ -32,7 +34,7 @@ class SubModal {
       this.wrapper.appendChild(this.children);
       document.addEventListener("click", this.clickOutSide);
     } else {
-      RangeSingleton.getInstance().initializeTmp();
+      this.root.range.initializeTmp();
       this.parent.removeChild(this.wrapper);
       document.removeEventListener("click", this.clickOutSide);
     }
