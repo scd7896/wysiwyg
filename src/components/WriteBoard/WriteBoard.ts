@@ -4,7 +4,7 @@ import { IEditorOptions } from "../../types";
 import { setStyle } from "../../utils/dom";
 
 export default class WriteBoard implements IComponent {
-  private board: HTMLElement;
+  board: HTMLElement;
   private hiddenTextArea: HTMLTextAreaElement;
   private parent: Element;
   private root: IRootStores;

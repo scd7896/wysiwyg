@@ -17,6 +17,7 @@ export class WYSIWYG {
   private root: HTMLElement;
   private options?: IEditorOptions;
   private stores: IRootStores;
+  board: HTMLElement;
 
   constructor(target: HTMLElement | string, options?: IEditorOptions) {
     const element = typeof target === "string" ? document.querySelector(target) : (target as HTMLElement);
@@ -40,9 +41,9 @@ export class WYSIWYG {
 
   private render() {
     new Menu(this.root, this.options, this.stores);
-    new WriteBoard(this.root, this.options, this.stores);
     new Resizer(this.root, this.stores);
-
+    const writeBoard = new WriteBoard(this.root, this.options, this.stores);
+    this.board = writeBoard.board;
     this.root.addEventListener("click", this.clickEventListener);
   }
 
