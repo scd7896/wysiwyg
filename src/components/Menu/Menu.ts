@@ -9,9 +9,6 @@ const menuClass = css`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  div + div {
-    margin-left: 8px;
-  }
   position: sticky;
   top: 0;
   left: 0;

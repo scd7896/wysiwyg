@@ -1,4 +1,12 @@
-import { findSpanStyleRemove, hasContains, setStyle, setRangeContainerStyle, getParentStyleValues } from "../utils/dom";
+import {
+  findSpanStyleRemove,
+  hasContains,
+  setStyle,
+  setRangeContainerStyle,
+  getParentStyleValues,
+  setRangeContainerNode,
+  findNodeNameRemove,
+} from "../utils/dom";
 import { BaseStore } from "./BaseStore";
 import HistoryStore from "./HistoryStore";
 
@@ -44,7 +52,8 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.type = this.selection.type;
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
-
+      this.setRangeNode();
+      console.log(this.rangeNodes);
       if (this.anchorNode === this.focusNode) {
         const values = getParentStyleValues(this.anchorNode, "text-decoration-line");
         this.setState({
@@ -61,19 +70,20 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     return this.instance;
   }
 
-  setStyle(styles: Record<string, string>) {
+  setStyle(styles: Record<string, string>, element?: HTMLElement) {
     this.loadTmp();
 
     if (this.type === "Range") {
       this.setRangeNode();
       this.nextRange = document.createRange();
-      this.rangeEventListener(styles);
+      this.rangeEventListener(styles, element);
       const newSelection = window.getSelection();
       newSelection.removeAllRanges();
       newSelection.addRange(this.nextRange);
     }
     if (this.type === "Caret") {
-      this.caretEventListener(styles);
+      if (element) this.insertNodeAndFoucs(element);
+      else this.caretEventListener(styles);
     }
     this.initializeTmp();
     const board = this.parent.querySelector(".board");
@@ -148,45 +158,65 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     this.insertNodeAndFoucs(span);
   }
 
-  private oneTextNodeStyleChange(styles: Record<string, string>) {
+  private oneNodeChange(styles: Record<string, string>, element?: HTMLElement) {
     const targetNode = this.focusNode;
-
-    const span = document.createElement("span");
     const fragmentNode = document.createDocumentFragment();
-    setStyle(span, styles);
-    const text = this.selection.anchorNode.textContent;
+    let node: HTMLElement = undefined;
+    if (element) {
+      node = element.cloneNode(true) as HTMLElement;
+      setStyle(node, styles);
+    } else {
+      const span = document.createElement("span");
+      setStyle(span, styles);
+      node = span;
+    }
+    const text = targetNode.textContent;
     const firstText = document.createTextNode(text.slice(0, this.range.startOffset));
-    span.textContent = text.slice(this.range.startOffset, this.range.endOffset);
+    node.textContent = text.slice(this.range.startOffset, this.range.endOffset);
     const thirdText = document.createTextNode(text.slice(this.range.endOffset));
 
     fragmentNode.appendChild(firstText);
-    fragmentNode.appendChild(span);
+    fragmentNode.appendChild(node);
     fragmentNode.appendChild(thirdText);
+
     if (targetNode.nodeName === "#text") {
       targetNode.parentElement.replaceChild(fragmentNode, targetNode);
     } else {
-      targetNode.replaceChild(fragmentNode, this.selection.anchorNode);
+      targetNode.replaceChild(fragmentNode, targetNode);
     }
   }
 
-  private rangeEventListener(styles: Record<string, string>) {
+  private rangeEventListener(styles: Record<string, string>, forSetElement?: HTMLElement) {
     if (this.anchorNode !== this.focusNode) {
-      this.rangeNodes.map((node, index, array) => {
+      this.rangeNodes.map((node: HTMLElement, index, array) => {
         if (index === 0 || index === array.length - 1) {
-          const spanNode = setRangeContainerStyle(this.range, node, styles, index === 0);
+          const spanNode = forSetElement
+            ? setRangeContainerNode(this.range, node, index === 0, forSetElement.cloneNode(true) as HTMLElement)
+            : setRangeContainerStyle(this.range, node, styles, index === 0);
           if (index === 0) this.nextRange.setStart(spanNode, 0);
           else this.nextRange.setEnd(spanNode, 1);
         } else {
-          setStyle(node as HTMLSpanElement, styles);
-          node.childNodes.forEach((child) => {
-            if (child.nodeName !== "#text") {
-              findSpanStyleRemove(child as HTMLSpanElement, styles);
-            }
-          });
+          if (forSetElement) {
+            const cloneNode = forSetElement.cloneNode(true) as HTMLElement;
+            cloneNode.innerHTML = node.innerHTML;
+            node.appendChild(cloneNode);
+            cloneNode.childNodes.forEach((child) => {
+              if (child.nodeName !== "#text") {
+                findNodeNameRemove(child as HTMLElement, cloneNode.nodeName);
+              }
+            });
+          } else {
+            setStyle(node, styles);
+            node.childNodes.forEach((child) => {
+              if (child.nodeName !== "#text") {
+                findSpanStyleRemove(child as HTMLSpanElement, styles);
+              }
+            });
+          }
         }
       });
     } else {
-      this.oneTextNodeStyleChange(styles);
+      this.oneNodeChange(styles, forSetElement);
     }
   }
 
