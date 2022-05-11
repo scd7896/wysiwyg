@@ -3,6 +3,7 @@ import VideoStore, { TVideoInsertMode } from "../../../model/VideoStore";
 import { IEditorOptions, IVideoOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
 import { getHostName, queryParse } from "../../../utils/string";
+import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
 
 class Video {
@@ -136,20 +137,10 @@ class Video {
 
   private renderUrlFormContents() {
     const section = document.createElement("div");
-    setStyle(section, {
-      padding: "8px",
-    });
-    const span = document.createElement("span");
-    span.textContent = "url";
-    const input = document.createElement("input");
-    input.name = "url";
-    setStyle(input, {
-      width: "260px",
-      height: "46px",
-    });
-    section.appendChild(span);
-    section.appendChild(input);
-    this.input = input;
+    const input = new Input("url");
+
+    section.appendChild(input.wrapper);
+    this.input = input.input;
     this.form.appendChild(section);
   }
 

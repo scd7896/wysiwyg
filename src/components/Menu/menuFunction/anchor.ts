@@ -51,8 +51,8 @@ export default class Anchor {
       this.modal.closeModal();
     });
 
-    this.inputForm.appendChild(urlInput.render());
-    this.inputForm.appendChild(textInput.render());
+    this.inputForm.appendChild(urlInput.wrapper);
+    this.inputForm.appendChild(textInput.wrapper);
     this.inputForm.appendChild(button);
   }
 }

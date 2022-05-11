@@ -3,6 +3,7 @@ import { FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { IEditorOptions } from "../../../types";
 import { setStyle } from "../../../utils/dom";
+import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
 
 export default class FontSize implements IComponent {
@@ -79,10 +80,8 @@ export default class FontSize implements IComponent {
   }
 
   private fontSizeInputSetting() {
-    const input = document.createElement("input");
-    input.type = "number";
-    input.name = "inputValue";
-    input.defaultValue = this.store.state.fontSize.toString();
+    const input = new Input("size");
+    input.input.defaultValue = this.store.state.fontSize.toString();
     const button = document.createElement("button");
     button.type = "submit";
     button.addEventListener("click", () => {
@@ -92,7 +91,7 @@ export default class FontSize implements IComponent {
       this.modal.closeModal();
     });
     button.textContent = "submit";
-    this.inputWrapper.appendChild(input);
+    this.inputWrapper.appendChild(input.wrapper);
     this.inputWrapper.appendChild(button);
   }
 }
