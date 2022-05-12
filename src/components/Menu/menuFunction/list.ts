@@ -1,13 +1,15 @@
 import { IRootStores } from "../../..";
+import { list } from "../../../icons";
 
 import { findParentByNodeName } from "../../../utils/dom";
+import Button from "../../Button";
 
 class List {
   root?: IRootStores;
   constructor(parent: HTMLElement, options?: any, root?: IRootStores) {
-    const button = document.createElement("button");
+    const button = new Button("menu").button;
     this.root = root;
-    button.textContent = "list";
+    button.innerHTML = list;
     button.addEventListener("click", () => this.insertUList());
     parent.appendChild(button);
     setTimeout(() => {

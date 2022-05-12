@@ -1,4 +1,5 @@
 import { IRootStores } from "../../..";
+import { link } from "../../../icons";
 import { IEditorOptions } from "../../../types";
 import Button from "../../Button";
 import Input from "../../Input";
@@ -15,8 +16,8 @@ export default class Anchor {
     this.wrapper = document.createElement("div");
     this.root = root;
     this.inputForm = document.createElement("div");
-    this.button = document.createElement("button");
-    this.button.textContent = "link";
+    this.button = new Button("menu").button;
+    this.button.innerHTML = link;
     this.modal = new SubModal(this.wrapper, this.inputForm, this.root);
 
     this.wrapper.appendChild(this.button);

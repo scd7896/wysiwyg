@@ -5,6 +5,8 @@ import { IEditorOptions, IImageOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
 import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
+import { image } from "../../../icons";
+import Button from "../../Button";
 
 export default class Image implements IComponent {
   private parent: HTMLElement;
@@ -25,7 +27,7 @@ export default class Image implements IComponent {
     this.parent = parent;
     this.root = root;
     this.wrapper = document.createElement("div");
-    this.toggleButton = document.createElement("button");
+    this.toggleButton = new Button("menu").button;
     this.imageForm = document.createElement("div");
     this.headerNav = document.createElement("div");
     ["file", "url"].map((type) => {
@@ -73,7 +75,7 @@ export default class Image implements IComponent {
     this.renderFormBody();
     this.renderFooterNav();
 
-    this.toggleButton.textContent = "image";
+    this.toggleButton.innerHTML = image;
     this.toggleButton.addEventListener("click", () => {
       this.modal.toggleModal();
     });

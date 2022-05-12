@@ -6,6 +6,7 @@ import { getHostName, queryParse } from "../../../utils/string";
 import Input from "../../Input";
 import Button from "../../Button";
 import SubModal from "../../SubModal/SubModal";
+import { video } from "../../../icons";
 
 class Video {
   private wrapper: HTMLElement;
@@ -26,7 +27,7 @@ class Video {
     this.parent = parent;
     this.form = document.createElement("div");
     this.modal = new SubModal(this.wrapper, this.form, root);
-    this.button = document.createElement("button");
+    this.button = new Button("menu").button;
     this.wrapper.appendChild(this.button);
     this.parent.appendChild(this.wrapper);
     this.store = new VideoStore();
@@ -40,7 +41,7 @@ class Video {
 
   render() {
     setStyle(this.wrapper, { position: "relative" });
-    this.button.textContent = "video";
+    this.button.innerHTML = video;
     this.button.addEventListener("click", () => {
       this.modal.toggleModal();
     });
