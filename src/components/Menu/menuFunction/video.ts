@@ -4,6 +4,7 @@ import { IEditorOptions, IVideoOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
 import { getHostName, queryParse } from "../../../utils/string";
 import Input from "../../Input";
+import Button from "../../Button";
 import SubModal from "../../SubModal/SubModal";
 
 class Video {
@@ -166,18 +167,11 @@ class Video {
 
   private renderFooterContents() {
     const footer = document.createElement("div");
-    const submitButton = document.createElement("button");
+    const submitButton = new Button();
     submitButton.textContent = "insert";
-    submitButton.type = "submit";
-    setStyle(submitButton, {
-      background: "none",
-      border: "none",
-      color: "#0098f7",
-      "font-size": "18px",
-      cursor: "pointer",
-    });
-    footer.appendChild(submitButton);
-    submitButton.addEventListener("click", async () => {
+
+    footer.appendChild(submitButton.button);
+    submitButton.button.addEventListener("click", async () => {
       switch (this.store.state.mode) {
         case "url":
           const hostName = getHostName(this.input.value);

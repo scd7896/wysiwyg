@@ -1,5 +1,6 @@
 import { IRootStores } from "../../..";
 import { IEditorOptions } from "../../../types";
+import Button from "../../Button";
 import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
 
@@ -15,7 +16,7 @@ export default class Anchor {
     this.root = root;
     this.inputForm = document.createElement("div");
     this.button = document.createElement("button");
-    this.button.textContent = "anchor";
+    this.button.textContent = "link";
     this.modal = new SubModal(this.wrapper, this.inputForm, this.root);
 
     this.wrapper.appendChild(this.button);
@@ -36,7 +37,7 @@ export default class Anchor {
   private renderForm() {
     const urlInput = new Input("url");
     const textInput = new Input("text");
-    const button = document.createElement("button");
+    const { button } = new Button();
     button.textContent = "Insert";
     button.addEventListener("click", () => {
       const instance = this.root.range;

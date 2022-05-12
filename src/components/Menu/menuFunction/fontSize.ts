@@ -3,6 +3,7 @@ import { FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { IEditorOptions } from "../../../types";
 import { setStyle } from "../../../utils/dom";
+import Button from "../../Button";
 import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
 
@@ -82,15 +83,15 @@ export default class FontSize implements IComponent {
   private fontSizeInputSetting() {
     const input = new Input("size");
     input.input.defaultValue = this.store.state.fontSize.toString();
-    const button = document.createElement("button");
-    button.type = "submit";
+    const { button } = new Button();
+
     button.addEventListener("click", () => {
       if (!isNaN(Number(input.value))) {
         this.store.setStyleSize(Number(input.value));
       }
       this.modal.closeModal();
     });
-    button.textContent = "submit";
+    button.textContent = "OK";
     this.inputWrapper.appendChild(input.wrapper);
     this.inputWrapper.appendChild(button);
   }
