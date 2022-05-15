@@ -119,7 +119,7 @@ export const setStyle = (node: HTMLElement, style: Record<string, string>) => {
   const keys = Object.keys(style);
   if (node.nodeName === "#text") {
     const span = document.createElement("span");
-    keys.map((key) => node.style.setProperty(key, style[key]));
+    keys.map((key) => span.style.setProperty(key, style[key]));
     span.textContent = node.textContent;
     node.parentElement?.replaceChild(span, node);
   } else {
