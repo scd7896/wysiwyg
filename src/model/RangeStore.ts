@@ -53,8 +53,6 @@ class RangeStore extends BaseStore<RangeState> {
       this.type = this.selection.type;
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
-      this.setRangeNode();
-      console.log(this.rangeNodes);
       if (this.anchorNode === this.focusNode) {
         const values = getParentStyleValues(this.anchorNode, "text-decoration-line");
         this.setState({
