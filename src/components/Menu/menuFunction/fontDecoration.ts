@@ -46,7 +46,6 @@ export default class FontDecoration {
   }
 
   update() {
-    this.buttons.map((button) => setStyle(button, { color: this.root.fontColorStore.state.color }));
     const textDecorationValues = this.root.range.state.textDecorationValues;
     this.renderButtons(textDecorationValues);
   }
