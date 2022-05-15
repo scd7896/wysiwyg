@@ -1,4 +1,4 @@
-import { ImageResizerStore } from "../model";
+import { IRootStores } from "..";
 import { findElementByType, setStyle } from "../utils/dom";
 
 export default class ImageResizer {
@@ -9,10 +9,12 @@ export default class ImageResizer {
   private currentYPoint: number;
   private board: HTMLDivElement;
   private targetNode: HTMLElement;
+  private root: IRootStores;
 
-  constructor(parent: Element) {
+  constructor(parent: Element, root: IRootStores) {
     this.board = parent.querySelector(".board");
     this.wrapper = document.createElement("div");
+    this.root = root;
     this.targetNode = undefined;
     [
       { top: "0%", left: "0%" },
@@ -38,7 +40,7 @@ export default class ImageResizer {
 
     parent.appendChild(this.wrapper);
     this.render();
-    ImageResizerStore.subscribe(this);
+    this.root.imageResizeStore.subscribe(this);
     this.wrapper.addEventListener("mousedown", this.mouseDownEventListener);
     parent.addEventListener("mousemove", this.mouseMoveEventListener);
     parent.addEventListener("mouseup", this.mouseUpEventListener);
@@ -46,7 +48,7 @@ export default class ImageResizer {
   }
 
   update() {
-    const targetNode = ImageResizerStore.state.selectedNode;
+    const targetNode = this.root.imageResizeStore.state.selectedNode;
     if (targetNode) {
       const clientRects = targetNode.getClientRects().item(0);
       setStyle(this.wrapper, {
@@ -75,7 +77,7 @@ export default class ImageResizer {
 
   mouseDownEventListener = (event: MouseEvent) => {
     const pointElement = findElementByType(event.target as HTMLElement, "point");
-    this.targetNode = ImageResizerStore.state.selectedNode;
+    this.targetNode = this.root.imageResizeStore.state.selectedNode;
 
     if (!pointElement || !this.targetNode) return;
 
@@ -132,14 +134,14 @@ export default class ImageResizer {
   }
 
   calculateNextXPx(diffPx: number) {
-    const targetNode = ImageResizerStore.state.selectedNode;
+    const targetNode = this.root.imageResizeStore.state.selectedNode;
     const targetNodeWidth = targetNode.clientWidth + diffPx;
 
     return targetNodeWidth;
   }
 
   calculateNextYPx(diffPx: number) {
-    const targetNode = ImageResizerStore.state.selectedNode;
+    const targetNode = this.root.imageResizeStore.state.selectedNode;
     const targetNodeHeight = targetNode.clientHeight + diffPx;
 
     return targetNodeHeight;

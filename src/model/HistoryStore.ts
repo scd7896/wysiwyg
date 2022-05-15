@@ -23,7 +23,7 @@ class HistoryStore extends BaseStore<HistoryState> {
     this.redoHistory = [];
   }
 
-  undo() {
+  undo(): string[] | undefined {
     if (this.undoHistory.length) {
       const history = this.undoHistory.pop();
       let max = this.currentChild.length;
@@ -58,7 +58,7 @@ class HistoryStore extends BaseStore<HistoryState> {
     }
   }
 
-  redo() {
+  redo(): string[] | undefined {
     if (this.redoHistory.length) {
       const history = this.redoHistory.pop();
       let max = this.currentChild.length;
@@ -241,4 +241,4 @@ class HistoryStore extends BaseStore<HistoryState> {
   }
 }
 
-export default new HistoryStore();
+export default HistoryStore;

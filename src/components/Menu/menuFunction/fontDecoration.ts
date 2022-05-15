@@ -1,20 +1,25 @@
-import { FontColorStore, FontDecorationStore, RangeSingleton } from "../../../model";
+import { IRootStores } from "../../..";
+import { IEditorOptions } from "../../../types";
 import { findElementByType, removeStyles, setStyle } from "../../../utils/dom";
+import Button from "../../Button";
 
 export default class FontDecoration {
   private wrapper: HTMLDivElement;
   private buttons: HTMLButtonElement[];
+  root: IRootStores;
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     const wrapper = document.createElement("div");
     this.wrapper = wrapper;
+    this.root = root;
     const buttons = ["underline", "line-through", "overline"].map((line) => this.menuButtonRender(line));
     this.buttons = buttons.map((button) => wrapper.appendChild(button));
 
     parent.appendChild(this.wrapper);
-    FontColorStore.subscribe(this);
-    FontDecorationStore.subscribe(this);
-    RangeSingleton.getInstance().subscribe(this);
+
+    this.root.fontColorStore.subscribe(this);
+    this.root.range.subscribe(this);
+
     this.render();
   }
 
@@ -28,11 +33,11 @@ export default class FontDecoration {
       const target = findElementByType(e.target, "line");
       if (target) {
         const lineStyle = target.dataset.value;
-        const textDecorationValues = RangeSingleton.getInstance().state.textDecorationValues;
+        const textDecorationValues = this.root.range.state.textDecorationValues;
         if (textDecorationValues?.find((styleValue) => lineStyle === styleValue)) {
-          removeStyles(RangeSingleton.getInstance().anchorNode, "text-decoration-line", lineStyle);
+          removeStyles(this.root.range.anchorNode, "text-decoration-line", lineStyle);
         } else {
-          RangeSingleton.getInstance().setStyle({
+          this.root.range.setStyle({
             "text-decoration-line": lineStyle,
           });
         }
@@ -41,8 +46,7 @@ export default class FontDecoration {
   }
 
   update() {
-    this.buttons.map((button) => setStyle(button, { color: FontColorStore.state.color }));
-    const textDecorationValues = RangeSingleton.getInstance().state.textDecorationValues;
+    const textDecorationValues = this.root.range.state.textDecorationValues;
     this.renderButtons(textDecorationValues);
   }
 
@@ -61,7 +65,7 @@ export default class FontDecoration {
     });
   }
   private menuButtonRender(line: string) {
-    const button = document.createElement("button");
+    const button = new Button("menu").button;
     button.textContent = "A";
     button.dataset.type = "line";
     button.dataset.value = line;

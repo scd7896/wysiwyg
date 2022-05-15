@@ -1,40 +1,38 @@
-import { MenuStore as menuStore } from "../../model";
 import { IComponent } from "../../model/BaseStore";
-import { MenuState } from "../../model/MenuStore";
 import * as menuFunction from "./menuFunction";
-import { css } from "@emotion/css";
+import { IEditorOptions } from "../../types";
+import { IRootStores } from "../..";
+import { setStyle } from "../../utils/dom";
 
-const menuClass = css`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  div + div {
-    margin-left: 8px;
-  }
-  position: sticky;
-  top: 0;
-  left: 0;
-  background: white;
-  border-bottom: 1px solid black;
-  z-index: 999;
-`;
 export default class Menu implements IComponent {
   private parent: Element;
-  private options: any;
+  private options: IEditorOptions;
+  private root: IRootStores;
 
-  constructor(parent: Element, options?: any) {
+  constructor(parent: Element, options?: IEditorOptions, root?: IRootStores) {
     this.parent = parent;
     this.options = options;
+    this.root = root;
     this.render();
-    menuStore.subscribe(this);
   }
 
   render() {
     const menu = document.createElement("div");
-    menu.classList.add(menuClass);
+    setStyle(menu, {
+      display: "flex",
+      "flex-wrap": "wrap",
+      "align-items": "center",
+      position: "sticky",
+      top: "0",
+      left: "0",
+      background: "white",
+      "border-bottom": "1px solid black",
+      "z-index": "999",
+    });
+
     const menuFunctionList = menuFunction as any;
-    const keys = Object.keys(menuFunction) as Array<keyof MenuState>;
-    keys.map((key) => new menuFunctionList[key](menu, this.options));
+    const keys = Object.keys(menuFunction) as Array<string>;
+    keys.map((key) => new menuFunctionList[key](menu, this.options, this.root));
     this.parent.appendChild(menu);
   }
 }

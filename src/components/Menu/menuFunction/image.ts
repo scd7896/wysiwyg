@@ -1,7 +1,12 @@
-import { ImageStore, RangeSingleton } from "../../../model";
+import { IRootStores } from "../../..";
+import { ImageStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
+import { IEditorOptions, IImageOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
+import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
+import { image } from "../../../icons";
+import Button from "../../Button";
 
 export default class Image implements IComponent {
   private parent: HTMLElement;
@@ -12,14 +17,17 @@ export default class Image implements IComponent {
   private footerNav: HTMLDivElement;
   private formBody: HTMLDivElement;
   private urlInput: HTMLInputElement;
-  private imageOptions?: any;
+  private imageOptions?: IImageOptions;
   private modal: SubModal;
+  private store: ImageStore;
+  private root: IRootStores;
 
-  constructor(parent: HTMLElement, options?: any) {
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     this.imageOptions = options?.image;
     this.parent = parent;
+    this.root = root;
     this.wrapper = document.createElement("div");
-    this.toggleButton = document.createElement("button");
+    this.toggleButton = new Button("menu").button;
     this.imageForm = document.createElement("div");
     this.headerNav = document.createElement("div");
     ["file", "url"].map((type) => {
@@ -32,6 +40,7 @@ export default class Image implements IComponent {
     });
 
     this.formBody = document.createElement("div");
+    this.store = new ImageStore();
 
     this.footerNav = document.createElement("div");
     const submitButton = document.createElement("button");
@@ -43,11 +52,12 @@ export default class Image implements IComponent {
     this.imageForm.appendChild(this.footerNav);
 
     this.wrapper.appendChild(this.toggleButton);
-    this.modal = new SubModal(this.wrapper, this.imageForm);
+    this.modal = new SubModal(this.wrapper, this.imageForm, root);
 
     this.parent.appendChild(this.wrapper);
+
     this.render();
-    ImageStore.subscribe(this);
+    this.store.subscribe(this);
   }
 
   update() {
@@ -65,7 +75,7 @@ export default class Image implements IComponent {
     this.renderFormBody();
     this.renderFooterNav();
 
-    this.toggleButton.textContent = "image";
+    this.toggleButton.innerHTML = image;
     this.toggleButton.addEventListener("click", () => {
       this.modal.toggleModal();
     });
@@ -73,7 +83,7 @@ export default class Image implements IComponent {
     this.headerNav.addEventListener("click", (e) => {
       const target = findElementByType(e.target as HTMLElement, "type");
       if (target) {
-        ImageStore.setMode(target.dataset.value as any);
+        this.store.setMode(target.dataset.value as any);
       }
     });
   }
@@ -91,7 +101,7 @@ export default class Image implements IComponent {
         cursor: "pointer",
       });
 
-      if (ImageStore.state.mode === button.dataset.value) {
+      if (this.store.state.mode === button.dataset.value) {
         setStyle(button, {
           "background-color": "#0098f7",
         });
@@ -122,7 +132,7 @@ export default class Image implements IComponent {
       cursor: "pointer",
     });
 
-    if (ImageStore.state.mode === "file") {
+    if (this.store.state.mode === "file") {
       setStyle(submitButton, {
         display: "none",
       });
@@ -136,8 +146,9 @@ export default class Image implements IComponent {
   renderFormBody() {
     const fragment = document.createDocumentFragment();
     this.formBody.innerHTML = "";
-    let input = document.createElement("input");
-    if (ImageStore.state.mode === "file") {
+
+    if (this.store.state.mode === "file") {
+      const input = document.createElement("input");
       input.type = "file";
       input.name = "file";
       this.urlInput = undefined;
@@ -151,17 +162,17 @@ export default class Image implements IComponent {
         this.insertImage(url);
         this.modal.closeModal();
       });
+      fragment.appendChild(input);
     } else {
-      this.urlInput = input;
-      input.type = "text";
-      input.name = "url";
+      const input = new Input("url");
+      this.urlInput = input.input;
+      fragment.appendChild(input.wrapper);
     }
-    fragment.appendChild(input);
     this.formBody.appendChild(fragment);
   }
 
   insertImage = (url: string) => {
-    RangeSingleton.getInstance().insertImage(url);
+    this.root.range.insertImage(url);
     this.modal.closeModal();
   };
 }

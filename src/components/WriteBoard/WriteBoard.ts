@@ -1,15 +1,19 @@
+import { IRootStores } from "../..";
 import { IComponent } from "../../model/BaseStore";
-import HistoryStore from "../../model/HistoryStore";
+import { IEditorOptions } from "../../types";
 import { setStyle } from "../../utils/dom";
 
 export default class WriteBoard implements IComponent {
-  private board: HTMLElement;
+  board: HTMLElement;
   private hiddenTextArea: HTMLTextAreaElement;
   private parent: Element;
+  private root: IRootStores;
 
-  constructor(parent: Element) {
+  constructor(parent: Element, options: IEditorOptions, root: IRootStores) {
     this.parent = parent;
+    this.root = root;
     this.render();
+    this.board.innerHTML = options.defaultValue || "";
   }
 
   private textAreaSetting() {
@@ -30,12 +34,12 @@ export default class WriteBoard implements IComponent {
           e.preventDefault();
 
           if (e.shiftKey) {
-            const child = HistoryStore.redo();
+            const child = this.root.history.redo();
             if (child) {
               this.board.innerHTML = child.join("");
             }
           } else {
-            const child = HistoryStore.undo();
+            const child = this.root.history.undo();
             if (child) {
               this.board.innerHTML = child.join("");
             }
@@ -48,7 +52,7 @@ export default class WriteBoard implements IComponent {
       this.board.childNodes.forEach((child: HTMLElement) => {
         result.push(child.outerHTML);
       });
-      HistoryStore.setNextChild(result, true);
+      this.root.history.setNextChild(result, true);
       this.hiddenTextArea.value = this.board.innerHTML;
       if (
         this.board.childNodes.length === 0 ||

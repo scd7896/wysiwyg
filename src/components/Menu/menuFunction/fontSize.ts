@@ -1,6 +1,10 @@
-import { RangeSingleton, FontSizeStore } from "../../../model";
+import { IRootStores } from "../../..";
+import { FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
+import { IEditorOptions } from "../../../types";
 import { setStyle } from "../../../utils/dom";
+import Button from "../../Button";
+import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
 
 export default class FontSize implements IComponent {
@@ -10,15 +14,20 @@ export default class FontSize implements IComponent {
   private button: HTMLButtonElement;
   private menuOpenButton: HTMLButtonElement;
   private modal: SubModal;
+  private store: FontSizeStore;
 
-  constructor(parent: HTMLElement) {
+  private root: IRootStores;
+
+  constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     this.parent = parent;
+    this.root = root;
+    this.store = new FontSizeStore();
     this.render();
-    FontSizeStore.subscribe(this);
+    this.store.subscribe(this);
   }
 
   update() {
-    this.button.textContent = `${FontSizeStore.state.fontSize}px`;
+    this.button.textContent = `${this.store.state.fontSize}px`;
   }
 
   render() {
@@ -26,14 +35,14 @@ export default class FontSize implements IComponent {
     const button = document.createElement("button");
     const menuOpenButton = document.createElement("button");
 
-    button.textContent = `${FontSizeStore.state.fontSize}px`;
+    button.textContent = `${this.store.state.fontSize}px`;
     menuOpenButton.textContent = "setting";
 
     this.wrapper = wrapper;
     this.button = button;
     this.menuOpenButton = menuOpenButton;
     this.inputWrapper = document.createElement("div");
-    this.modal = new SubModal(this.wrapper, this.inputWrapper);
+    this.modal = new SubModal(this.wrapper, this.inputWrapper, this.root);
     this.fontSizeInputSetting();
     this.wrapperSetting();
     this.buttonSetting();
@@ -52,8 +61,8 @@ export default class FontSize implements IComponent {
     setStyle(this.button, { border: "1px solid #aaa", padding: "8px 14px", "background-color": "white" });
 
     this.button.addEventListener("click", () => {
-      RangeSingleton.getInstance().setStyle({
-        "font-size": `${FontSizeStore.state.fontSize}px`,
+      this.root.range.setStyle({
+        "font-size": `${this.store.state.fontSize}px`,
       });
     });
   }
@@ -72,20 +81,18 @@ export default class FontSize implements IComponent {
   }
 
   private fontSizeInputSetting() {
-    const input = document.createElement("input");
-    input.type = "number";
-    input.name = "inputValue";
-    input.defaultValue = FontSizeStore.state.fontSize.toString();
-    const button = document.createElement("button");
-    button.type = "submit";
+    const input = new Input("size");
+    input.input.defaultValue = this.store.state.fontSize.toString();
+    const { button } = new Button();
+
     button.addEventListener("click", () => {
       if (!isNaN(Number(input.value))) {
-        FontSizeStore.setStyleSize(Number(input.value));
+        this.store.setStyleSize(Number(input.value));
       }
       this.modal.closeModal();
     });
-    button.textContent = "submit";
-    this.inputWrapper.appendChild(input);
+    button.textContent = "OK";
+    this.inputWrapper.appendChild(input.wrapper);
     this.inputWrapper.appendChild(button);
   }
 }

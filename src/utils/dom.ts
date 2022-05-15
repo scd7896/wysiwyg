@@ -47,6 +47,18 @@ export const findSpanStyleRemove = (span: HTMLSpanElement, styles: Record<string
   }
 };
 
+export const findNodeNameRemove = (element: HTMLElement, nodeName: string) => {
+  element.childNodes.forEach((child) => {
+    if (child.nodeName !== "#text") findNodeNameRemove(child as HTMLElement, nodeName);
+  });
+
+  if (element.nodeName === nodeName) {
+    const fragment = document.createDocumentFragment();
+    element.childNodes.forEach((child) => fragment.appendChild(child));
+    element.parentElement.replaceChild(fragment, element);
+  }
+};
+
 export const setStyleFullText = (node: Node, styles: Record<string, string>) => {
   const span = document.createElement("span");
   span.textContent = node.textContent;
@@ -73,6 +85,22 @@ const splitTextStyle = (node: Node, offset: number, applyStyleIndex: 0 | 1, styl
   return [fragment, span];
 };
 
+const splitTextNode = (node: Node, offset: number, applyStyleIndex: 0 | 1, element: HTMLElement) => {
+  const fragment = document.createDocumentFragment();
+  const textContent = node.textContent;
+  const textArrays = [textContent.slice(0, offset), textContent.slice(offset)];
+  element.textContent = textArrays[applyStyleIndex];
+  const textNode = document.createTextNode(textArrays[applyStyleIndex === 1 ? 0 : 1]);
+  if (applyStyleIndex) {
+    fragment.appendChild(textNode);
+    fragment.appendChild(element);
+  } else {
+    fragment.appendChild(element);
+    fragment.appendChild(textNode);
+  }
+  return [fragment, element];
+};
+
 export const setRangeContainerStyle = (range: Range, node: Node, styles: Record<string, string>, isStart: boolean) => {
   const offset = isStart ? range.startOffset : range.endOffset;
   const [fragment, span] = splitTextStyle(node, offset, isStart ? 1 : 0, styles);
@@ -80,9 +108,23 @@ export const setRangeContainerStyle = (range: Range, node: Node, styles: Record<
   return span;
 };
 
+export const setRangeContainerNode = (range: Range, node: Node, isStart: boolean, element: HTMLElement) => {
+  const offset = isStart ? range.startOffset : range.endOffset;
+  const [fragment, afterSetElement] = splitTextNode(node, offset, isStart ? 1 : 0, element);
+  node.parentElement.replaceChild(fragment, node);
+  return afterSetElement;
+};
+
 export const setStyle = (node: HTMLElement, style: Record<string, string>) => {
   const keys = Object.keys(style);
-  keys.map((key) => node.style.setProperty(key, style[key]));
+  if (node.nodeName === "#text") {
+    const span = document.createElement("span");
+    keys.map((key) => span.style.setProperty(key, style[key]));
+    span.textContent = node.textContent;
+    node.parentElement?.replaceChild(span, node);
+  } else {
+    keys.map((key) => node.style.setProperty(key, style[key]));
+  }
 };
 
 export const findElementByType = (target: HTMLElement, type: string) => {

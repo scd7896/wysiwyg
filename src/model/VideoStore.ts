@@ -21,4 +21,4 @@ class VideoStore extends BaseStore<VideoState> {
   }
 }
 
-export default new VideoStore();
+export default VideoStore;

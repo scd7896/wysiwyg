@@ -22,4 +22,4 @@ class ImageStore extends BaseStore<ImageState> {
   }
 }
 
-export default new ImageStore();
+export default ImageStore;

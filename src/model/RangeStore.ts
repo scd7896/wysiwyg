@@ -1,14 +1,22 @@
-import { findSpanStyleRemove, hasContains, setStyle, setRangeContainerStyle, getParentStyleValues } from "../utils/dom";
+import { IRootStores } from "..";
+import {
+  findSpanStyleRemove,
+  hasContains,
+  setStyle,
+  setRangeContainerStyle,
+  getParentStyleValues,
+  setRangeContainerNode,
+  findNodeNameRemove,
+} from "../utils/dom";
 import { BaseStore } from "./BaseStore";
-import HistoryStore from "./HistoryStore";
 
-class RangeSingletonState {
+class RangeState {
   textDecorationValues: string[];
   constructor() {
     this.textDecorationValues = [];
   }
 }
-class RangeSingleton extends BaseStore<RangeSingletonState> {
+class RangeStore extends BaseStore<RangeState> {
   selection: Selection;
   type: string;
   range: Range;
@@ -26,11 +34,12 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
 
   nextRange: Range;
 
-  private static instance: RangeSingleton;
+  root: IRootStores;
 
-  private constructor(parent?: HTMLElement) {
-    super(new RangeSingletonState());
+  constructor(parent?: HTMLElement, root?: IRootStores) {
+    super(new RangeState());
     this.parent = parent;
+    this.root = root;
     this.rangeNodes = [];
 
     document.addEventListener("selectionchange", (e) => {
@@ -44,7 +53,8 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
       this.type = this.selection.type;
       this.anchorNode = this.selection.anchorNode;
       this.focusNode = this.selection.focusNode;
-
+      this.setRangeNode();
+      console.log(this.rangeNodes);
       if (this.anchorNode === this.focusNode) {
         const values = getParentStyleValues(this.anchorNode, "text-decoration-line");
         this.setState({
@@ -55,31 +65,26 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     });
   }
 
-  static getInstance(parent?: HTMLElement) {
-    if (this.instance) return this.instance;
-    this.instance = new this(parent);
-    return this.instance;
-  }
-
-  setStyle(styles: Record<string, string>) {
+  setStyle(styles: Record<string, string>, element?: HTMLElement) {
     this.loadTmp();
 
     if (this.type === "Range") {
       this.setRangeNode();
       this.nextRange = document.createRange();
-      this.rangeEventListener(styles);
+      this.rangeEventListener(styles, element);
       const newSelection = window.getSelection();
       newSelection.removeAllRanges();
       newSelection.addRange(this.nextRange);
     }
     if (this.type === "Caret") {
-      this.caretEventListener(styles);
+      if (element) this.insertNodeAndFoucs(element);
+      else this.caretEventListener(styles);
     }
     this.initializeTmp();
     const board = this.parent.querySelector(".board");
     const boardChildsString: string[] = [];
     board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
-    HistoryStore.setNextChild(boardChildsString);
+    this.root.history.setNextChild(boardChildsString);
   }
 
   insertImage(src: string) {
@@ -113,13 +118,14 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
 
   insertNodeAndFoucs(node: HTMLElement) {
     const board = this.parent.querySelector(".board");
+    if (!this.range) return;
     if (hasContains(board, this.range.startContainer) && hasContains(board, this.range.endContainer)) {
       this.range.insertNode(node);
       this.changeFocusNode(node);
+      const boardChildsString: string[] = [];
+      board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
+      this.root.history.setNextChild(boardChildsString);
     }
-    const boardChildsString: string[] = [];
-    board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
-    HistoryStore.setNextChild(boardChildsString);
   }
 
   changeFocusNode(node: Node) {
@@ -147,45 +153,65 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
     this.insertNodeAndFoucs(span);
   }
 
-  private oneTextNodeStyleChange(styles: Record<string, string>) {
+  private oneNodeChange(styles: Record<string, string>, element?: HTMLElement) {
     const targetNode = this.focusNode;
-
-    const span = document.createElement("span");
     const fragmentNode = document.createDocumentFragment();
-    setStyle(span, styles);
-    const text = this.selection.anchorNode.textContent;
+    let node: HTMLElement = undefined;
+    if (element) {
+      node = element.cloneNode(true) as HTMLElement;
+      setStyle(node, styles);
+    } else {
+      const span = document.createElement("span");
+      setStyle(span, styles);
+      node = span;
+    }
+    const text = targetNode.textContent;
     const firstText = document.createTextNode(text.slice(0, this.range.startOffset));
-    span.textContent = text.slice(this.range.startOffset, this.range.endOffset);
+    node.textContent = text.slice(this.range.startOffset, this.range.endOffset);
     const thirdText = document.createTextNode(text.slice(this.range.endOffset));
 
     fragmentNode.appendChild(firstText);
-    fragmentNode.appendChild(span);
+    fragmentNode.appendChild(node);
     fragmentNode.appendChild(thirdText);
+
     if (targetNode.nodeName === "#text") {
       targetNode.parentElement.replaceChild(fragmentNode, targetNode);
     } else {
-      targetNode.replaceChild(fragmentNode, this.selection.anchorNode);
+      targetNode.replaceChild(fragmentNode, targetNode);
     }
   }
 
-  private rangeEventListener(styles: Record<string, string>) {
+  private rangeEventListener(styles: Record<string, string>, forSetElement?: HTMLElement) {
     if (this.anchorNode !== this.focusNode) {
-      this.rangeNodes.map((node, index, array) => {
+      this.rangeNodes.map((node: HTMLElement, index, array) => {
         if (index === 0 || index === array.length - 1) {
-          const spanNode = setRangeContainerStyle(this.range, node, styles, index === 0);
+          const spanNode = forSetElement
+            ? setRangeContainerNode(this.range, node, index === 0, forSetElement.cloneNode(true) as HTMLElement)
+            : setRangeContainerStyle(this.range, node, styles, index === 0);
           if (index === 0) this.nextRange.setStart(spanNode, 0);
           else this.nextRange.setEnd(spanNode, 1);
         } else {
-          setStyle(node as HTMLSpanElement, styles);
-          node.childNodes.forEach((child) => {
-            if (child.nodeName !== "#text") {
-              findSpanStyleRemove(child as HTMLSpanElement, styles);
-            }
-          });
+          if (forSetElement) {
+            const cloneNode = forSetElement.cloneNode(true) as HTMLElement;
+            cloneNode.innerHTML = node.innerHTML;
+            if (node.nodeName !== "#text") node.replaceChildren(cloneNode);
+            cloneNode.childNodes.forEach((child) => {
+              if (child.nodeName !== "#text") {
+                findNodeNameRemove(child as HTMLElement, cloneNode.nodeName);
+              }
+            });
+          } else {
+            setStyle(node, styles);
+            node.childNodes.forEach((child) => {
+              if (child.nodeName !== "#text") {
+                findSpanStyleRemove(child as HTMLSpanElement, styles);
+              }
+            });
+          }
         }
       });
     } else {
-      this.oneTextNodeStyleChange(styles);
+      this.oneNodeChange(styles, forSetElement);
     }
   }
 
@@ -213,4 +239,4 @@ class RangeSingleton extends BaseStore<RangeSingletonState> {
   }
 }
 
-export default RangeSingleton;
+export default RangeStore;
