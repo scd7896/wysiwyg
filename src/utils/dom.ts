@@ -38,7 +38,7 @@ export const findSpanStyleRemove = (span: HTMLSpanElement, styles: Record<string
   styleKeys.map((key) => span.style.removeProperty(key));
 
   span.childNodes.forEach((child) => {
-    if (child.nodeName === "SPAN") findSpanStyleRemove(child as HTMLSpanElement, styles);
+    if (child.nodeName !== "#text") findSpanStyleRemove(child as HTMLSpanElement, styles);
   });
 
   if (span.nodeName === "SPAN" && span.style.length === 0) {
