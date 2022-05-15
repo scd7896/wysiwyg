@@ -1,21 +1,30 @@
 import { setStyle } from "../utils/dom";
 
 class Input {
+  wrapper: HTMLElement;
+  input: HTMLInputElement;
   private name: string;
-  private wrapper: HTMLElement;
-  private input: HTMLInputElement;
 
   constructor(name: string) {
     this.name = name;
+    this.render();
   }
 
   render() {
     if (this.wrapper) return this.wrapper;
     const wrapper = document.createElement("div");
+    setStyle(wrapper, {
+      padding: "8px 0",
+    });
     const title = document.createElement("span");
+    setStyle(title, {
+      display: "block",
+      "margin-bottom": "4px",
+      "font-size": "24px",
+    });
     title.textContent = `${this.name}: `;
     const input = document.createElement("input");
-    setStyle(input, { "margin-left": "4px" });
+    setStyle(input, { width: "260px", height: "46px" });
 
     wrapper.appendChild(title);
     wrapper.appendChild(input);

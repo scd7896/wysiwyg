@@ -3,7 +3,10 @@ import { ImageStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { IEditorOptions, IImageOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
+import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
+import { image } from "../../../icons";
+import Button from "../../Button";
 
 export default class Image implements IComponent {
   private parent: HTMLElement;
@@ -24,7 +27,7 @@ export default class Image implements IComponent {
     this.parent = parent;
     this.root = root;
     this.wrapper = document.createElement("div");
-    this.toggleButton = document.createElement("button");
+    this.toggleButton = new Button("menu").button;
     this.imageForm = document.createElement("div");
     this.headerNav = document.createElement("div");
     ["file", "url"].map((type) => {
@@ -72,7 +75,7 @@ export default class Image implements IComponent {
     this.renderFormBody();
     this.renderFooterNav();
 
-    this.toggleButton.textContent = "image";
+    this.toggleButton.innerHTML = image;
     this.toggleButton.addEventListener("click", () => {
       this.modal.toggleModal();
     });
@@ -143,8 +146,9 @@ export default class Image implements IComponent {
   renderFormBody() {
     const fragment = document.createDocumentFragment();
     this.formBody.innerHTML = "";
-    let input = document.createElement("input");
+
     if (this.store.state.mode === "file") {
+      const input = document.createElement("input");
       input.type = "file";
       input.name = "file";
       this.urlInput = undefined;
@@ -158,12 +162,12 @@ export default class Image implements IComponent {
         this.insertImage(url);
         this.modal.closeModal();
       });
+      fragment.appendChild(input);
     } else {
-      this.urlInput = input;
-      input.type = "text";
-      input.name = "url";
+      const input = new Input("url");
+      this.urlInput = input.input;
+      fragment.appendChild(input.wrapper);
     }
-    fragment.appendChild(input);
     this.formBody.appendChild(fragment);
   }
 

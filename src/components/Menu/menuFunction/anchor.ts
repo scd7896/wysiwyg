@@ -1,5 +1,7 @@
 import { IRootStores } from "../../..";
+import { link } from "../../../icons";
 import { IEditorOptions } from "../../../types";
+import Button from "../../Button";
 import Input from "../../Input";
 import SubModal from "../../SubModal/SubModal";
 
@@ -14,8 +16,8 @@ export default class Anchor {
     this.wrapper = document.createElement("div");
     this.root = root;
     this.inputForm = document.createElement("div");
-    this.button = document.createElement("button");
-    this.button.textContent = "anchor";
+    this.button = new Button("menu").button;
+    this.button.innerHTML = link;
     this.modal = new SubModal(this.wrapper, this.inputForm, this.root);
 
     this.wrapper.appendChild(this.button);
@@ -36,7 +38,7 @@ export default class Anchor {
   private renderForm() {
     const urlInput = new Input("url");
     const textInput = new Input("text");
-    const button = document.createElement("button");
+    const { button } = new Button();
     button.textContent = "Insert";
     button.addEventListener("click", () => {
       const instance = this.root.range;
@@ -51,8 +53,8 @@ export default class Anchor {
       this.modal.closeModal();
     });
 
-    this.inputForm.appendChild(urlInput.render());
-    this.inputForm.appendChild(textInput.render());
+    this.inputForm.appendChild(urlInput.wrapper);
+    this.inputForm.appendChild(textInput.wrapper);
     this.inputForm.appendChild(button);
   }
 }

@@ -3,7 +3,10 @@ import VideoStore, { TVideoInsertMode } from "../../../model/VideoStore";
 import { IEditorOptions, IVideoOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
 import { getHostName, queryParse } from "../../../utils/string";
+import Input from "../../Input";
+import Button from "../../Button";
 import SubModal from "../../SubModal/SubModal";
+import { video } from "../../../icons";
 
 class Video {
   private wrapper: HTMLElement;
@@ -24,7 +27,7 @@ class Video {
     this.parent = parent;
     this.form = document.createElement("div");
     this.modal = new SubModal(this.wrapper, this.form, root);
-    this.button = document.createElement("button");
+    this.button = new Button("menu").button;
     this.wrapper.appendChild(this.button);
     this.parent.appendChild(this.wrapper);
     this.store = new VideoStore();
@@ -38,7 +41,7 @@ class Video {
 
   render() {
     setStyle(this.wrapper, { position: "relative" });
-    this.button.textContent = "video";
+    this.button.innerHTML = video;
     this.button.addEventListener("click", () => {
       this.modal.toggleModal();
     });
@@ -136,20 +139,10 @@ class Video {
 
   private renderUrlFormContents() {
     const section = document.createElement("div");
-    setStyle(section, {
-      padding: "8px",
-    });
-    const span = document.createElement("span");
-    span.textContent = "url";
-    const input = document.createElement("input");
-    input.name = "url";
-    setStyle(input, {
-      width: "260px",
-      height: "46px",
-    });
-    section.appendChild(span);
-    section.appendChild(input);
-    this.input = input;
+    const input = new Input("url");
+
+    section.appendChild(input.wrapper);
+    this.input = input.input;
     this.form.appendChild(section);
   }
 
@@ -175,18 +168,11 @@ class Video {
 
   private renderFooterContents() {
     const footer = document.createElement("div");
-    const submitButton = document.createElement("button");
+    const submitButton = new Button();
     submitButton.textContent = "insert";
-    submitButton.type = "submit";
-    setStyle(submitButton, {
-      background: "none",
-      border: "none",
-      color: "#0098f7",
-      "font-size": "18px",
-      cursor: "pointer",
-    });
-    footer.appendChild(submitButton);
-    submitButton.addEventListener("click", async () => {
+
+    footer.appendChild(submitButton.button);
+    submitButton.button.addEventListener("click", async () => {
       switch (this.store.state.mode) {
         case "url":
           const hostName = getHostName(this.input.value);

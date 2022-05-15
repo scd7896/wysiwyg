@@ -1,6 +1,7 @@
 import { IRootStores } from "../../..";
 import { IEditorOptions } from "../../../types";
 import { findElementByType, removeStyles, setStyle } from "../../../utils/dom";
+import Button from "../../Button";
 
 export default class FontDecoration {
   private wrapper: HTMLDivElement;
@@ -45,7 +46,6 @@ export default class FontDecoration {
   }
 
   update() {
-    this.buttons.map((button) => setStyle(button, { color: this.root.fontColorStore.state.color }));
     const textDecorationValues = this.root.range.state.textDecorationValues;
     this.renderButtons(textDecorationValues);
   }
@@ -65,7 +65,7 @@ export default class FontDecoration {
     });
   }
   private menuButtonRender(line: string) {
-    const button = document.createElement("button");
+    const button = new Button("menu").button;
     button.textContent = "A";
     button.dataset.type = "line";
     button.dataset.value = line;

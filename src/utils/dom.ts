@@ -117,7 +117,14 @@ export const setRangeContainerNode = (range: Range, node: Node, isStart: boolean
 
 export const setStyle = (node: HTMLElement, style: Record<string, string>) => {
   const keys = Object.keys(style);
-  keys.map((key) => node.style.setProperty(key, style[key]));
+  if (node.nodeName === "#text") {
+    const span = document.createElement("span");
+    keys.map((key) => span.style.setProperty(key, style[key]));
+    span.textContent = node.textContent;
+    node.parentElement?.replaceChild(span, node);
+  } else {
+    keys.map((key) => node.style.setProperty(key, style[key]));
+  }
 };
 
 export const findElementByType = (target: HTMLElement, type: string) => {
