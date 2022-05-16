@@ -1,12 +1,7 @@
 import EventObject from "../event/Event";
+import { IDiff } from "../types";
 import { findByAfterIndex } from "../utils/array";
 import { BaseStore } from "./BaseStore";
-
-interface IDiff {
-  line: number;
-  value: string;
-  type: "insert" | "delete";
-}
 
 class HistoryState {}
 

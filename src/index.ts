@@ -88,8 +88,8 @@ export class WYSIWYG {
     this.event.on(type, listener);
   }
 
-  emit(type: string, value: any) {
-    this.event.emit(type, value);
+  emit(type: string, ...value: any[]) {
+    this.event.emit(type, ...value);
   }
 
   removeListener(type: string, listener: Function) {

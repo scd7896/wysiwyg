@@ -18,4 +18,15 @@ export class WYSIWYG {
   redo: () => void;
   insertNode: (element: HTMLElement) => void;
   setRangeStyle: (style: Record<string, string>) => void;
+  on: (type: string, listener: Function) => void;
+  emit: (type: string, ...args: any[]) => void;
+  removeListener: (type: string, listener: Function) => void;
+  undoHistory: IDiff[][];
+  redoHistory: IDiff[][];
+}
+
+export interface IDiff {
+  line: number;
+  value: string;
+  type: "insert" | "delete";
 }

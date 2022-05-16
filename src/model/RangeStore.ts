@@ -1,4 +1,3 @@
-import { IRootStores } from "..";
 import EventObject from "../event/Event";
 import {
   findSpanStyleRemove,
