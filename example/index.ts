@@ -9,3 +9,7 @@ const wysiwyg = new WYSIWYG("#root", {
     },
   },
 });
+
+wysiwyg.on("text:change", (value: string) => {
+  console.log(value);
+});

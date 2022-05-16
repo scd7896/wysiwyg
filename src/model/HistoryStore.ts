@@ -1,3 +1,4 @@
+import EventObject from "../event/Event";
 import { findByAfterIndex } from "../utils/array";
 import { BaseStore } from "./BaseStore";
 
@@ -16,11 +17,16 @@ class HistoryStore extends BaseStore<HistoryState> {
 
   timer: any;
 
-  constructor() {
+  event?: EventObject;
+
+  constructor(event?: EventObject) {
     super(new HistoryState());
     this.currentChild = [];
     this.undoHistory = [];
     this.redoHistory = [];
+    this.event = event;
+
+    this.event?.on("history:setNextChild", this.setNextChild.bind(this));
   }
 
   undo(): string[] | undefined {
@@ -54,6 +60,7 @@ class HistoryStore extends BaseStore<HistoryState> {
 
       this.currentChild = result;
       this.redoHistory.push(history);
+      this.event?.emit("text:change", this.currentChild.join(""));
       return this.currentChild;
     }
   }
@@ -89,6 +96,7 @@ class HistoryStore extends BaseStore<HistoryState> {
 
       this.currentChild = result;
       this.undoHistory.push(history);
+      this.event?.emit("text:change", this.currentChild.join(""));
       return this.currentChild;
     }
   }

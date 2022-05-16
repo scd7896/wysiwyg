@@ -17,18 +17,21 @@ export class WYSIWYG {
   private root: HTMLElement;
   private options?: IEditorOptions;
   private stores: IRootStores;
+  private event: EventObject;
   board: HTMLElement;
 
   constructor(target: HTMLElement | string, options?: IEditorOptions) {
     const element = typeof target === "string" ? document.querySelector(target) : (target as HTMLElement);
+    if (!element) throw new Error("element is Not Defined");
+    const event = new EventObject();
+    this.event = event;
     this.stores = {
-      event: new EventObject(element as HTMLElement),
-      history: new HistoryStore(),
-      range: new RangeSingleton(element as HTMLElement),
+      event,
+      history: new HistoryStore(event),
+      range: new RangeSingleton(element as HTMLElement, event),
       imageResizeStore: new ImageResizerStore(),
       fontColorStore: new FontColorStore(),
     };
-    this.stores.range.root = this.stores;
 
     this.options = options;
 
@@ -79,6 +82,18 @@ export class WYSIWYG {
       const board = this.root.querySelector(".board");
       board.innerHTML = result.join("");
     }
+  }
+
+  on(type: string, listener: Function) {
+    this.event.on(type, listener);
+  }
+
+  emit(type: string, value: any) {
+    this.event.emit(type, value);
+  }
+
+  removeListener(type: string, listener: Function) {
+    this.event.removeListener(type, listener);
   }
 
   get undoHistory() {

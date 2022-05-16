@@ -1,4 +1,5 @@
 import { IRootStores } from "..";
+import EventObject from "../event/Event";
 import {
   findSpanStyleRemove,
   hasContains,
@@ -34,12 +35,12 @@ class RangeStore extends BaseStore<RangeState> {
 
   nextRange: Range;
 
-  root: IRootStores;
+  event: EventObject;
 
-  constructor(parent?: HTMLElement, root?: IRootStores) {
+  constructor(parent?: HTMLElement, event?: EventObject) {
     super(new RangeState());
     this.parent = parent;
-    this.root = root;
+    this.event = event;
     this.rangeNodes = [];
 
     document.addEventListener("selectionchange", (e) => {
@@ -59,6 +60,7 @@ class RangeStore extends BaseStore<RangeState> {
           textDecorationValues: values,
         });
       }
+      this.event.emit("text:change", board.innerHTML);
       this.setState({});
     });
   }
@@ -80,9 +82,9 @@ class RangeStore extends BaseStore<RangeState> {
     }
     this.initializeTmp();
     const board = this.parent.querySelector(".board");
-    const boardChildsString: string[] = [];
-    board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
-    this.root.history.setNextChild(boardChildsString);
+    const childStringArray: string[] = [];
+    board.childNodes.forEach((child: HTMLElement) => childStringArray.push(child.outerHTML));
+    this.event.emit("history:setNextChild", childStringArray);
   }
 
   insertImage(src: string) {
@@ -120,9 +122,9 @@ class RangeStore extends BaseStore<RangeState> {
     if (hasContains(board, this.range.startContainer) && hasContains(board, this.range.endContainer)) {
       this.range.insertNode(node);
       this.changeFocusNode(node);
-      const boardChildsString: string[] = [];
-      board.childNodes.forEach((child: HTMLElement) => boardChildsString.push(child.outerHTML));
-      this.root.history.setNextChild(boardChildsString);
+      const childStringArray: string[] = [];
+      board.childNodes.forEach((child: HTMLElement) => childStringArray.push(child.outerHTML));
+      this.event.emit("history:setNextChild", childStringArray);
     }
   }
 
