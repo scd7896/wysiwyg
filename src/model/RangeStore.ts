@@ -59,7 +59,6 @@ class RangeStore extends BaseStore<RangeState> {
           textDecorationValues: values,
         });
       }
-      this.event.emit("text:change", board.innerHTML);
       this.setState({});
     });
   }
@@ -84,6 +83,7 @@ class RangeStore extends BaseStore<RangeState> {
     const childStringArray: string[] = [];
     board.childNodes.forEach((child: HTMLElement) => childStringArray.push(child.outerHTML));
     this.event.emit("history:setNextChild", childStringArray);
+    this.event.emit("text:change", board.innerHTML);
   }
 
   insertImage(src: string) {
@@ -124,6 +124,7 @@ class RangeStore extends BaseStore<RangeState> {
       const childStringArray: string[] = [];
       board.childNodes.forEach((child: HTMLElement) => childStringArray.push(child.outerHTML));
       this.event.emit("history:setNextChild", childStringArray);
+      this.event.emit("text:change", board.innerHTML);
     }
   }
 
