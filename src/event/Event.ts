@@ -16,9 +16,11 @@ class EventObject {
   }
 
   emit(type: string, ...args: any[]) {
-    if (this.listeners[type]) {
-      this.listeners[type].map((listener) => listener(...args));
-    }
+    setTimeout(() => {
+      if (this.listeners[type]) {
+        this.listeners[type].map((listener) => listener(...args));
+      }
+    }, 1);
   }
 
   removeListener(type: string, listener: Function) {
