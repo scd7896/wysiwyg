@@ -1,3 +1,4 @@
+import EventObject from "../event/Event";
 import { BaseStore } from "./BaseStore";
 
 class ImageResizeState {

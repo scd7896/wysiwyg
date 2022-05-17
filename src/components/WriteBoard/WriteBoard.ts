@@ -60,6 +60,9 @@ export default class WriteBoard implements IComponent {
       ) {
         this.createDummyDiv();
       }
+      setTimeout(() => {
+        this.root.event.emit("text:change", this.board.innerHTML);
+      }, 10);
     });
     this.createDummyDiv();
   }

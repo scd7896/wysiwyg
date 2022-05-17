@@ -9,19 +9,17 @@ class List {
   constructor(parent: HTMLElement, options?: any, root?: IRootStores) {
     const button = new Button("menu").button;
     this.root = root;
+
     button.innerHTML = list;
     button.addEventListener("click", () => this.insertUList());
     parent.appendChild(button);
     setTimeout(() => {
       const board: HTMLDivElement = parent.parentElement.querySelector(".board");
-      this.root.event.on("tabkey", () => {
-        this.tabulList();
-      });
 
       board.addEventListener("keydown", (e) => {
         if (e.key === "Tab") {
           e.preventDefault();
-          this.root.event.emit("tabkey");
+          this.tabulList();
         }
       });
     }, 11);
