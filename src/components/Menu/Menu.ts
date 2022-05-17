@@ -31,8 +31,12 @@ export default class Menu implements IComponent {
     });
 
     const menuFunctionList = menuFunction as any;
-    const keys = Object.keys(menuFunction) as Array<string>;
-    keys.map((key) => new menuFunctionList[key](menu, this.options, this.root));
+    if (this.options.menus) {
+      this.options.menus.map((key) => new menuFunctionList[key](menu, this.options, this.root));
+    } else {
+      const keys = Object.keys(menuFunction) as Array<string>;
+      keys.map((key) => new menuFunctionList[key](menu, this.options, this.root));
+    }
     this.parent.appendChild(menu);
   }
 }

@@ -1,18 +1,32 @@
 class EventObject {
-  private parent: HTMLElement;
+  private listeners: Record<string, Array<Function>>;
 
-  constructor(parent?: HTMLElement) {
-    if (parent) this.parent = parent;
+  constructor() {
+    this.listeners = {};
   }
 
-  on(type: string, listener: any) {
-    this.parent.addEventListener(type, listener);
+  on(type: string, listener: Function) {
+    if (this.listeners[type]) {
+      if (!this.listeners[type].find((it) => it === listener)) {
+        this.listeners[type].push(listener);
+      }
+    } else {
+      this.listeners[type] = [listener];
+    }
   }
 
-  emit(type: string) {
-    const event = new Event(type);
+  emit(type: string, ...args: any[]) {
+    setTimeout(() => {
+      if (this.listeners[type]) {
+        this.listeners[type].map((listener) => listener(...args));
+      }
+    }, 1);
+  }
 
-    this.parent.dispatchEvent(event);
+  removeListener(type: string, listener: Function) {
+    if (this.listeners[type]) {
+      this.listeners[type] = this.listeners[type].filter((it) => it !== listener);
+    }
   }
 }
 

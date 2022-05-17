@@ -54,7 +54,10 @@ export default class FontSize implements IComponent {
   }
 
   private wrapperSetting() {
-    this.wrapper.style.setProperty("position", "relative");
+    setStyle(this.wrapper, {
+      position: "relative",
+      padding: "4px",
+    });
   }
 
   private buttonSetting() {

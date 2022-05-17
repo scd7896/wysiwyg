@@ -26,6 +26,7 @@ export default class FontDecoration {
   render() {
     setStyle(this.wrapper, {
       position: "relative",
+      padding: "4px",
     });
     this.renderButtons();
 
