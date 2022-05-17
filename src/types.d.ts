@@ -10,6 +10,7 @@ export interface IEditorOptions {
   image?: IImageOptions;
   video?: IVideoOptions;
   defaultValue?: string;
+  menus?: string[];
 }
 
 export class WYSIWYG {

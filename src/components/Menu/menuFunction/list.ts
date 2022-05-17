@@ -9,6 +9,7 @@ class List {
   constructor(parent: HTMLElement, options?: any, root?: IRootStores) {
     const button = new Button("menu").button;
     this.root = root;
+
     button.innerHTML = list;
     button.addEventListener("click", () => this.insertUList());
     parent.appendChild(button);

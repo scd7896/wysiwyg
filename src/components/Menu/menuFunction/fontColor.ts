@@ -57,6 +57,7 @@ export default class FontColor {
       display: "flex",
       position: "relative",
       border: "1px solid black",
+      margin: "4px",
     });
 
     setStyle(this.applyButton, {
