@@ -23,7 +23,7 @@ export default class WriteBoard implements IComponent {
   private boardSetting() {
     setStyle(this.board, {
       width: "100%",
-      padding: "12px",
+      padding: "24px",
       "box-sizing": "border-box",
     });
     this.board.contentEditable = "true";
