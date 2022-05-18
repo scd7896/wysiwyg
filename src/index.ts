@@ -45,8 +45,8 @@ export class WYSIWYG {
 
   private render() {
     new Menu(this.root, this.options, this.stores);
-    new Resizer(this.root, this.stores);
     const writeBoard = new WriteBoard(this.root, this.options, this.stores);
+    new Resizer(this.root, this.stores);
     this.board = writeBoard.board;
     this.root.addEventListener("click", this.clickEventListener);
   }

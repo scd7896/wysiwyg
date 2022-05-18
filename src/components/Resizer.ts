@@ -31,6 +31,7 @@ export default class ImageResizer {
         position: "absolute",
         transform: "translate(-50%, -50%)",
         "border-radius": "100%",
+        "z-index": "1000",
       });
       point.dataset.type = "point";
       point.dataset.value = position.left === "100%" ? "right" : "left";
@@ -72,6 +73,7 @@ export default class ImageResizer {
       position: "absolute",
       display: "none",
       border: "1px solid blue",
+      "z-index": "10",
     });
   }
 
@@ -80,13 +82,7 @@ export default class ImageResizer {
     this.targetNode = this.root.imageResizeStore.state.selectedNode;
 
     if (!pointElement || !this.targetNode) return;
-
-    const width = this.targetNode.style.getPropertyPriority("width");
-    if (!width) {
-      const percent = (this.targetNode.clientWidth / this.targetNode.parentElement.clientWidth) * 100;
-      this.targetNode.style.setProperty("width", `${percent}%`);
-    }
-
+    event.preventDefault();
     this.startPosition = pointElement.dataset.value as "right" | "left";
     this.startYPosition = pointElement.dataset.yValue as "bottom" | "top";
     this.currentXPoint = event.x;
@@ -96,6 +92,8 @@ export default class ImageResizer {
   mouseMoveEventListener = (event: MouseEvent) => {
     if (!this.startPosition) return;
     if (this.targetNode) {
+      console.log("mobe?");
+      event.preventDefault();
       if (this.targetNode.nodeName === "IMG") {
         this.resizingImg(event.x);
       } else {
@@ -110,34 +108,48 @@ export default class ImageResizer {
 
   private resizingVideo(x: number, y: number) {
     this.resizingImg(x);
-    let nextHeightPx = 0;
+    let nextPaddingBottom = 0;
+    this.targetNode.style.setProperty("height", "0px");
+    const paddingBottom = this.targetNode.style.getPropertyValue("padding-bottom").split("%")[0];
     if (this.startYPosition === "top") {
-      nextHeightPx = this.calculateNextYPx(this.currentYPoint - y);
+      nextPaddingBottom = this.calculatePercent(this.currentYPoint - y, Number(paddingBottom));
     } else {
-      nextHeightPx = this.calculateNextYPx(y - this.currentYPoint);
+      nextPaddingBottom = this.calculatePercent(y - this.currentYPoint, Number(paddingBottom));
     }
-    if (nextHeightPx > this.board.clientHeight - 24) nextHeightPx = this.board.clientHeight - 24;
+    if (nextPaddingBottom < 5) nextPaddingBottom = 5;
 
-    this.targetNode.style.setProperty("height", `${nextHeightPx}px`);
+    this.targetNode.style.setProperty("padding-bottom", `${nextPaddingBottom}%`);
   }
 
   private resizingImg(x: number) {
-    let nextWidthPx = 0;
+    const targetNode = this.root.imageResizeStore.state.selectedNode;
+    const width = targetNode.style.getPropertyValue("width");
+    const prevPercent = width ? Number(width.split("%")[0]) : 100;
+    let nextPercent = 0;
     if (this.startPosition === "left") {
-      nextWidthPx = this.calculateNextXPx(this.currentXPoint - x);
+      nextPercent = this.calculatePercent(this.currentXPoint - x, prevPercent);
     } else {
-      nextWidthPx = this.calculateNextXPx(x - this.currentXPoint);
+      nextPercent = this.calculatePercent(x - this.currentXPoint, prevPercent);
     }
-    if (nextWidthPx > this.board.clientWidth - 24) nextWidthPx = this.board.clientWidth - 24;
 
-    this.targetNode.style.setProperty("width", `${nextWidthPx}px`);
+    if (nextPercent > 100) nextPercent = 100;
+    if (nextPercent < 3) nextPercent = 3;
+
+    this.targetNode.style.setProperty("width", `${nextPercent}%`);
   }
 
-  calculateNextXPx(diffPx: number) {
+  calculatePercent(diffPx: number, prev?: number) {
     const targetNode = this.root.imageResizeStore.state.selectedNode;
-    const targetNodeWidth = targetNode.clientWidth + diffPx;
+    const percent = prev || targetNode.style.getPropertyValue("width").split("%")[0];
+    if (diffPx > 0) {
+      return Number(percent) + 0.1;
+    }
 
-    return targetNodeWidth;
+    if (diffPx < 0) {
+      return Number(percent) - 0.1;
+    }
+
+    return Number(percent);
   }
 
   calculateNextYPx(diffPx: number) {
