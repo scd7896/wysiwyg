@@ -89,10 +89,12 @@ class Video {
   private embeddedYoutube(contents: string) {
     const board = this.parent.parentElement.querySelector(".board");
     const wrapper = document.createElement("div");
+    const frameWrapper = document.createElement("div");
     wrapper.dataset.nodeName = "IFRAME";
     setStyle(wrapper, {
-      width: `${board.clientWidth - 24}px`,
-      height: `${((board.clientWidth - 24) / 16) * 9}px`,
+      width: `100%`,
+      height: `0`,
+      "padding-bottom": "56.25%",
       position: "relative",
     });
     const iframe = document.createElement("iframe");
@@ -105,14 +107,23 @@ class Video {
       left: "0",
       top: "0",
       cursor: "pointer",
+      "z-index": "100",
+    });
+    setStyle(frameWrapper, {
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      left: "0",
+      top: "0",
     });
     setStyle(iframe, {
       width: `100%`,
       height: `100%`,
       display: "block",
     });
+    frameWrapper.appendChild(iframe);
     wrapper.appendChild(clickedDummy);
-    wrapper.appendChild(iframe);
+    wrapper.appendChild(frameWrapper);
     this.root.range.insertNodeAndFoucs(wrapper);
     this.modal.closeModal();
   }
