@@ -1,8 +1,8 @@
 # WYSIWYG
 
 Demo: https://scd7896.github.io/wysiwyg/example/
+<img width="434" alt="스크린샷 2022-05-18 오후 10 02 30" src="https://user-images.githubusercontent.com/46440142/169278109-d9b1a764-cc07-4ea9-b6ac-41817334b0ac.png">
 
-<img width="1236" alt="스크린샷 2022-03-27 오후 4 56 32" src="https://user-images.githubusercontent.com/46440142/160272431-afb1110a-f5a0-48ba-b3ee-58f6dba7d2ff.png">
 
 ## Example
 
