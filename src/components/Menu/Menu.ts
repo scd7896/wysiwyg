@@ -1,7 +1,7 @@
 import { IComponent } from "../../model/BaseStore";
 import * as menuFunction from "./menuFunction";
 import { IEditorOptions } from "../../types";
-import { IRootStores } from "../..";
+import { IRootStores } from "../../wysiwyg";
 import { setStyle } from "../../utils/dom";
 
 export default class Menu implements IComponent {
@@ -31,7 +31,7 @@ export default class Menu implements IComponent {
     });
 
     const menuFunctionList = menuFunction as any;
-    if (this.options.menus) {
+    if (this.options?.menus) {
       this.options.menus.map((key) => new menuFunctionList[key](menu, this.options, this.root));
     } else {
       const keys = Object.keys(menuFunction) as Array<string>;

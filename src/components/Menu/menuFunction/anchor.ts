@@ -1,4 +1,4 @@
-import { IRootStores } from "../../..";
+import { IRootStores } from "../../../wysiwyg";
 import { link } from "../../../icons";
 import { IEditorOptions } from "../../../types";
 import Button from "../../Button";

@@ -1,0 +1,10 @@
+node_modules
+example
+docs
+.vscode
+.babelrc
+.eslintrc
+.gitignore
+.prettierrc
+jest.config.jest
+package-lock.json
