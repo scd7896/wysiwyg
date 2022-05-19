@@ -1,24 +1,55 @@
 # WYSIWYG
 
-Demo: https://scd7896.github.io/wysiwyg/example/
-<img width="1236" alt="스크린샷 2022-03-27 오후 4 56 32" src="https://user-images.githubusercontent.com/46440142/160272431-afb1110a-f5a0-48ba-b3ee-58f6dba7d2ff.png">
+Demo: https://scd7896.github.io/wysiwyg/example/  
+<img width="434" alt="스크린샷 2022-05-18 오후 10 02 30" src="https://user-images.githubusercontent.com/46440142/169278109-d9b1a764-cc07-4ea9-b6ac-41817334b0ac.png">. 
 
-## Description
 
-HTML Editor
+## Example
 
-## 구현 기능
+```javascript
+const wysiwyg = new WYSIWYG("#root", {
+  image: {
+    onUploadSingle: async (file: File) => {
+      const url = URL.createObjectURL(file);
 
-- 범위에 폰트 스타일을 적용 할 수 있는 기능 개발 함.
-- 범위에 폰트 스타일을 적용 할 때, 스타일이 겹치면 반드시 적용 할 수 있게, 하위 내용을 삭제 할 수 있는 기능 개발 함.
-- 작성한 히스토리를 관리하며 undo redo 기능을 개발 함.
-- image 삽입 및 리사이즈 기능 개발 함.
+      return url;
+    },
+  },
+});
 
-## 사용한 API
+wysiwyg.on("text:change", (value: string) => {
+  console.log(value);
+});
 
-- selection API, RangeAPI
+const insertWantElement = document.createElement("div");
+insertWantElement = "test Element";
+wysiwyg.insertNode(insertWantElement);
+```
 
-## 기술 스택
+## WYSIWYG
 
-- typescript
-- webpack
+```typescript
+class WYSIWYG {
+  undo: () => void;
+  redo: () => void;
+  insertNode: (element: HTMLElement) => void;
+  setRangeStyle: (style: Record<string, string>) => void;
+  on: (type: string, listener: Function) => void;
+  emit: (type: string, ...args: any[]) => void;
+  removeListener: (type: string, listener: Function) => void;
+  undoHistory: IDiff[][];
+  redoHistory: IDiff[][];
+}
+
+interface IDiff {
+  line: number;
+  value: string;
+  type: "insert" | "delete";
+}
+```
+
+## Event
+
+| name        | function               | description                                |
+| ----------- | ---------------------- | ------------------------------------------ |
+| text:change | (text: string) => void | board의 내용이 변경 될 때 마다 실행됩니다. |
