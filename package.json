@@ -1,15 +1,18 @@
 {
-  "name": "wysiwyg",
-  "version": "1.0.0",
+  "name": "ksv-wysiwyg",
+  "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./src/types.d.ts",
   "scripts": {
-    "dev": "webpack --watch --mode=development",
+    "dev": "rm -rf dist && webpack --watch --mode=development",
+    "prod": "rm -rf dist && babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline && npm publish",
     "start": "http-serve -p 9170 ."
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.17.10",
     "@babel/core": "^7.17.5",
     "@babel/preset-typescript": "^7.16.7",
     "@types/jest": "^27.5.0",

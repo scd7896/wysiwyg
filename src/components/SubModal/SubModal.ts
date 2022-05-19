@@ -1,4 +1,4 @@
-import { IRootStores } from "../..";
+import { IRootStores } from "../../wysiwyg";
 import SubModalStore from "../../model/SubModalStore";
 import { hasContains, setStyle } from "../../utils/dom";
 

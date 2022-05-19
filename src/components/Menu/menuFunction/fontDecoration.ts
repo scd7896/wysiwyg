@@ -1,4 +1,4 @@
-import { IRootStores } from "../../..";
+import { IRootStores } from "../../../wysiwyg";
 import { IEditorOptions } from "../../../types";
 import { findElementByType, removeStyles, setStyle } from "../../../utils/dom";
 import Button from "../../Button";

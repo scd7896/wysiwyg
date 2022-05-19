@@ -1,4 +1,4 @@
-import { IRootStores } from "..";
+import { IRootStores } from "../wysiwyg";
 import { findElementByType, setStyle } from "../utils/dom";
 
 export default class ImageResizer {

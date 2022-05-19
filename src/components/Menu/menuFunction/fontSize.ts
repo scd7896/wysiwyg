@@ -1,4 +1,4 @@
-import { IRootStores } from "../../..";
+import { IRootStores } from "../../../wysiwyg";
 import { FontSizeStore } from "../../../model";
 import { IComponent } from "../../../model/BaseStore";
 import { IEditorOptions } from "../../../types";

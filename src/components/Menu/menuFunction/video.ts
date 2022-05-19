@@ -1,4 +1,4 @@
-import { IRootStores } from "../../..";
+import { IRootStores } from "../../../wysiwyg";
 import VideoStore, { TVideoInsertMode } from "../../../model/VideoStore";
 import { IEditorOptions, IVideoOptions } from "../../../types";
 import { findElementByType, setStyle } from "../../../utils/dom";
@@ -22,7 +22,7 @@ class Video {
 
   constructor(parent: HTMLElement, options?: IEditorOptions, root?: IRootStores) {
     this.root = root;
-    this.options = options.video;
+    this.options = options?.video;
     this.wrapper = document.createElement("div");
     this.parent = parent;
     this.form = document.createElement("div");

@@ -1,4 +1,4 @@
-import { IRootStores } from "../..";
+import { IRootStores } from "../../wysiwyg";
 import { IComponent } from "../../model/BaseStore";
 import { IEditorOptions } from "../../types";
 import { setStyle } from "../../utils/dom";
@@ -13,7 +13,7 @@ export default class WriteBoard implements IComponent {
     this.parent = parent;
     this.root = root;
     this.render();
-    this.board.innerHTML = options.defaultValue || "";
+    this.board.innerHTML = options?.defaultValue || "";
   }
 
   private textAreaSetting() {

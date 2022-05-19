@@ -1,4 +1,4 @@
-import { IRootStores } from "../../..";
+import { IRootStores } from "../../../wysiwyg";
 import { list } from "../../../icons";
 
 import { findParentByNodeName } from "../../../utils/dom";
