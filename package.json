@@ -1,12 +1,12 @@
 {
   "name": "ksv-wysiwyg",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "./dist/index.js",
   "types": "./src/types.d.ts",
   "scripts": {
     "dev": "rm -rf dist && webpack --watch --mode=development",
-    "prod": "rm -rf dist && babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
+    "prod": "rm -rf dist && babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline && npm publish",
     "start": "http-serve -p 9170 ."
   },
   "author": "",
