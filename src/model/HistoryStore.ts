@@ -28,7 +28,6 @@ class HistoryStore extends BaseStore<HistoryState> {
         if (e.key === "z" || e.key === "Z") {
           e.preventDefault();
           const child = e.shiftKey ? this.redo() : this.undo();
-          console.log(child);
           if (child) this.event.emit("board:setHTML", child.join(""));
         }
         return;
@@ -109,7 +108,6 @@ class HistoryStore extends BaseStore<HistoryState> {
   }
 
   setNextChild(childStringArray: string[], isDebounce?: boolean) {
-    console.log("c", childStringArray);
     if (isDebounce) {
       if (this.timer) {
         clearTimeout(this.timer);
