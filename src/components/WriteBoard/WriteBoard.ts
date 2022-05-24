@@ -36,9 +36,9 @@ export default class WriteBoard implements IComponent {
     this.boardSetting();
   }
 
-  private setHTML(nextHTML: string) {
+  private setHTML(nextHTML: string, isHistoryPush?: boolean) {
     this.board.innerHTML = nextHTML;
-    this.afterBoardChange();
+    this.afterBoardChange(isHistoryPush);
   }
 
   private textAreaSetting() {
@@ -66,14 +66,14 @@ export default class WriteBoard implements IComponent {
     });
   }
 
-  private afterBoardChange(isBoardChange?: boolean) {
+  private afterBoardChange(isHistoryPush?: boolean) {
     this.hiddenTextArea.value = this.board.innerHTML;
 
     const result: string[] = [];
     this.board.childNodes.forEach((child: HTMLElement) => {
       result.push(child.outerHTML);
     });
-    if (isBoardChange) this.event.emit("history:setNextChild", result, true);
+    if (isHistoryPush) this.event.emit("history:setNextChild", result, true);
 
     if (
       this.board.childNodes.length === 0 ||
