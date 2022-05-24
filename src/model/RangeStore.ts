@@ -42,6 +42,8 @@ class RangeStore extends BaseStore<RangeState> {
     this.event = event;
     this.rangeNodes = [];
 
+    this.event.on("range:insertNodeAndFoucs", this.insertNodeAndFoucs.bind(this));
+
     document.addEventListener("selectionchange", (e) => {
       const board = this.parent.querySelector(".board");
       const selection = document.getSelection();

@@ -8,6 +8,7 @@ class SubModal {
   private wrapper: HTMLElement;
   private parent: HTMLElement;
   private root: IRootStores;
+  public onClose: () => void;
 
   constructor(parent: HTMLElement, children: HTMLElement, root: IRootStores) {
     this.parent = parent;
@@ -53,6 +54,7 @@ class SubModal {
 
   closeModal() {
     this.store.closeModal();
+    if (this.onClose) this.onClose();
   }
 
   toggleModal() {
