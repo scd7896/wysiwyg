@@ -3,7 +3,7 @@ import EventObject from "./event/Event";
 import { FontColorStore, ImageResizerStore, RangeSingleton } from "./model";
 import HistoryStore from "./model/HistoryStore";
 import { IEditorOptions } from "./types";
-import { findResizeNodeByParentNode, setStyle } from "./utils/dom";
+import { findIsWriteBoardFunction, setStyle } from "./utils/dom";
 
 export interface IRootStores {
   event: EventObject;
@@ -45,14 +45,14 @@ export class WYSIWYG {
 
   private render() {
     new Menu(this.root, this.options, this.stores);
-    const writeBoard = new WriteBoard(this.root, this.options, this.stores);
+    const writeBoard = new WriteBoard(this.root, this.options, this.event);
     new Resizer(this.root, this.stores);
     this.board = writeBoard.board;
     this.root.addEventListener("click", this.clickEventListener);
   }
 
   private clickEventListener = (e: any) => {
-    const node = findResizeNodeByParentNode(e.target);
+    const node = findIsWriteBoardFunction(e.target);
     if (node) {
       this.stores.imageResizeStore.setSelectedNode(node);
     } else {

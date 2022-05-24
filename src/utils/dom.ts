@@ -136,7 +136,7 @@ export const findElementByType = (target: HTMLElement, type: string) => {
   return null;
 };
 
-export const findResizeNodeByParentNode = (target: HTMLElement) => {
+export const findIsWriteBoardFunction = (target: HTMLElement) => {
   let tmpTarget = target;
   while (tmpTarget) {
     if (tmpTarget.nodeName === "IMG" || tmpTarget.dataset.nodeName === "IFRAME") return tmpTarget;

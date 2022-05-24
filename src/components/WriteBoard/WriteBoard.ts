@@ -1,81 +1,20 @@
-import { IRootStores } from "../../wysiwyg";
 import { IComponent } from "../../model/BaseStore";
 import { IEditorOptions } from "../../types";
 import { setStyle } from "../../utils/dom";
+import EventObject from "../../event/Event";
 
 export default class WriteBoard implements IComponent {
   board: HTMLElement;
   private hiddenTextArea: HTMLTextAreaElement;
   private parent: Element;
-  private root: IRootStores;
+  private event: EventObject;
 
-  constructor(parent: Element, options: IEditorOptions, root: IRootStores) {
+  constructor(parent: Element, options: IEditorOptions, event: EventObject) {
     this.parent = parent;
-    this.root = root;
+    this.event = event;
     this.render();
     this.board.innerHTML = options?.defaultValue || "";
-  }
-
-  private textAreaSetting() {
-    this.hiddenTextArea.style.display = "none";
-  }
-
-  private boardSetting() {
-    setStyle(this.board, {
-      width: "100%",
-      padding: "24px",
-      "box-sizing": "border-box",
-    });
-    this.board.contentEditable = "true";
-    this.board.classList.add("board");
-    this.board.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === "z" || e.key === "Z") {
-          e.preventDefault();
-
-          if (e.shiftKey) {
-            const child = this.root.history.redo();
-            if (child) {
-              this.board.innerHTML = child.join("");
-            }
-          } else {
-            const child = this.root.history.undo();
-            if (child) {
-              this.board.innerHTML = child.join("");
-            }
-          }
-        }
-        return;
-      }
-
-      const result: string[] = [];
-      this.board.childNodes.forEach((child: HTMLElement) => {
-        result.push(child.outerHTML);
-      });
-      this.root.history.setNextChild(result, true);
-      this.hiddenTextArea.value = this.board.innerHTML;
-      if (
-        this.board.childNodes.length === 0 ||
-        (this.board.childNodes.length <= 1 && this.board.childNodes.item(0).nodeName === "BR")
-      ) {
-        this.createDummyDiv();
-      }
-      setTimeout(() => {
-        this.root.event.emit("text:change", this.board.innerHTML);
-      }, 10);
-    });
-    this.createDummyDiv();
-  }
-
-  private createDummyDiv() {
-    const dummyDiv = document.createElement("div");
-    const dummyBr = document.createElement("br");
-    dummyDiv.appendChild(dummyBr);
-    if (this.board.childNodes.length === 0) {
-      this.board.appendChild(dummyDiv);
-    } else {
-      this.board.replaceChild(dummyDiv, this.board.childNodes.item(0));
-    }
+    this.event.on("board:setHTML", this.setHTML.bind(this));
   }
 
   getValue() {
@@ -95,5 +34,66 @@ export default class WriteBoard implements IComponent {
 
     this.textAreaSetting();
     this.boardSetting();
+  }
+
+  private setHTML(nextHTML: string) {
+    this.board.innerHTML = nextHTML;
+    this.afterBoardChange();
+  }
+
+  private textAreaSetting() {
+    this.hiddenTextArea.style.display = "none";
+  }
+
+  private boardSetting() {
+    setStyle(this.board, {
+      width: "100%",
+      padding: "24px",
+      "box-sizing": "border-box",
+    });
+    this.board.contentEditable = "true";
+    this.board.classList.add("board");
+    this.createDummyDiv();
+
+    this.board.addEventListener("click", (e) => {
+      this.event.emit("board:click", e);
+    });
+    this.board.addEventListener("keydown", (e: KeyboardEvent) => {
+      this.event.emit("board:key", e);
+      if (e.ctrlKey || e.metaKey) return;
+
+      this.afterBoardChange(true);
+    });
+  }
+
+  private afterBoardChange(isBoardChange?: boolean) {
+    this.hiddenTextArea.value = this.board.innerHTML;
+
+    const result: string[] = [];
+    this.board.childNodes.forEach((child: HTMLElement) => {
+      result.push(child.outerHTML);
+    });
+    if (isBoardChange) this.event.emit("history:setNextChild", result, true);
+
+    if (
+      this.board.childNodes.length === 0 ||
+      (this.board.childNodes.length <= 1 && this.board.childNodes.item(0).nodeName === "BR")
+    ) {
+      this.createDummyDiv();
+    }
+    setTimeout(() => {
+      this.event.emit("text:change", this.board.innerHTML);
+    }, 10);
+  }
+
+  private createDummyDiv() {
+    const dummyDiv = document.createElement("div");
+    const dummyBr = document.createElement("br");
+    dummyDiv.appendChild(dummyBr);
+    if (this.board.childNodes.length === 0) {
+      this.board.appendChild(dummyDiv);
+    } else {
+      this.board.replaceChild(dummyDiv, this.board.childNodes.item(0));
+    }
   }
 }
