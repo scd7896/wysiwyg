@@ -1,5 +1,5 @@
-import { IRootStores } from "../wysiwyg";
-import { findElementByType, setStyle } from "../utils/dom";
+import { IRootStores } from "../../../wysiwyg";
+import { findElementByType, setStyle } from "../../../utils/dom";
 
 export default class ImageResizer {
   private wrapper: HTMLDivElement;
@@ -92,7 +92,6 @@ export default class ImageResizer {
   mouseMoveEventListener = (event: MouseEvent) => {
     if (!this.startPosition) return;
     if (this.targetNode) {
-      console.log("mobe?");
       event.preventDefault();
       if (this.targetNode.nodeName === "IMG") {
         this.resizingImg(event.x);
