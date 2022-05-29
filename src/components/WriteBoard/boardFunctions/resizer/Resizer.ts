@@ -95,7 +95,6 @@ export default abstract class Resizer {
     if (!this.startPosition) return;
     if (this.targetNode) {
       event.preventDefault();
-      console.log(this.targetNode, "move");
       this.resizing(event.x, event.y);
       this.update();
     }

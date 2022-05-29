@@ -13,7 +13,6 @@ class BoardFunction {
     new ImageFunction(parent, store);
     event.on("board:click", (e: MouseEvent) => {
       const { node, nodeName } = findIsWriteBoardFunction(e.target as HTMLElement);
-      console.log(node, nodeName);
       if (node) {
         switch (nodeName) {
           case "IMG": {

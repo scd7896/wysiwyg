@@ -10,7 +10,6 @@ class VideoFunction extends Resizer {
   }
 
   resizing(x: number, y: number): void {
-    console.log("video", x, y);
     if (this.store.state.nodeName !== "IFRAME") return;
     this.resizeVideo(x, y);
   }

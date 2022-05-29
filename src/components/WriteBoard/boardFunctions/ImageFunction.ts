@@ -10,7 +10,6 @@ class ImageFunction extends Resizer {
     return this.store.state.nodeName === "IMG";
   }
   resizing(x: number, y: number): void {
-    console.log(x, y);
     if (this.store.state.nodeName !== "IMG") return;
     const targetNode = this.store.state.selectedNode;
     const width = targetNode.style.getPropertyValue("width");
