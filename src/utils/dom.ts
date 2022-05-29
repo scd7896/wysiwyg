@@ -139,10 +139,11 @@ export const findElementByType = (target: HTMLElement, type: string) => {
 export const findIsWriteBoardFunction = (target: HTMLElement) => {
   let tmpTarget = target;
   while (tmpTarget) {
-    if (tmpTarget.nodeName === "IMG" || tmpTarget.dataset.nodeName === "IFRAME") return tmpTarget;
+    const nodeName = tmpTarget.dataset.nodeName || tmpTarget.nodeName;
+    if (nodeName === "IMG" || nodeName === "IFRAME") return { node: tmpTarget, nodeName };
     tmpTarget = tmpTarget.parentElement;
   }
-  return null;
+  return {};
 };
 
 export const findParentByNodeName = (target: HTMLElement, nodeName: string) => {
