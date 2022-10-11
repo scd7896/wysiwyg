@@ -1,5 +1,3 @@
-import { WYSIWYG } from "../src/wysiwyg";
+import Core from "../src/Core";
 
-const wysiwyg = new WYSIWYG("#root");
-
-wysiwyg.on("text:change", (value: string) => {});
+const wysiwyg = new Core("#root");
